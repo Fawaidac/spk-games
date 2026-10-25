@@ -1,0 +1,377 @@
+/**
+ * GameMatch RecSys Platform - Cyberpunk Esports Theme CSS
+ * Standardized Typography System:
+ * 1. Headings & Display (Teks Besar / Judul): 'Orbitron'
+ * 2. Body, UI & Data (Teks Kecil / Paragraf / Tabel / Metrik): 'Chivo'
+ */
+
+/* ======================================================== */
+/* 1. TYPOGRAPHY HARMONIZATION (STRICT 2-FONT SYSTEM)       */
+/* ======================================================== */
+:root {
+  --font-heading: 'Orbitron', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Chivo', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-body);
+  color: #e2e8f0;
+  background-color: #080b11;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings: Teks Besar Menggunakan Orbitron */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-headline:not(.material-symbols-outlined),
+.font-headline-xl:not(.material-symbols-outlined),
+.font-headline-lg:not(.material-symbols-outlined),
+.font-headline-md:not(.material-symbols-outlined),
+.font-headline-sm:not(.material-symbols-outlined),
+.font-title-lg:not(.material-symbols-outlined),
+.font-title-md:not(.material-symbols-outlined),
+.font-orbitron:not(.material-symbols-outlined),
+.font-display:not(.material-symbols-outlined) {
+  font-family: var(--font-heading);
+  letter-spacing: 0.03em;
+}
+
+/* Body & UI: Teks Kecil Menggunakan Chivo (Kecualikan Icon Material Symbols) */
+p,
+span:not(.material-symbols-outlined),
+a:not(.material-symbols-outlined),
+button:not(.material-symbols-outlined),
+div:not(.material-symbols-outlined),
+input,
+select,
+textarea,
+table,
+th,
+td,
+label,
+.font-body:not(.material-symbols-outlined),
+.font-body-lg:not(.material-symbols-outlined),
+.font-body-md:not(.material-symbols-outlined),
+.font-body-sm:not(.material-symbols-outlined),
+.font-mono:not(.material-symbols-outlined),
+.font-code-metric:not(.material-symbols-outlined),
+.font-label-lg:not(.material-symbols-outlined),
+.font-label-md:not(.material-symbols-outlined),
+.font-label-sm:not(.material-symbols-outlined) {
+  font-family: var(--font-body);
+}
+
+/* Special tracking for metric badges to feel precise and sharp */
+.font-code-metric,
+.font-mono {
+  letter-spacing: 0.04em;
+}
+
+/* ======================================================== */
+/* 1.1 ADMIN DASHBOARD: SEMUA FONT MENGGUNAKAN CHIVO        */
+/* ======================================================== */
+body.admin-dashboard,
+body.admin-dashboard h1,
+body.admin-dashboard h2,
+body.admin-dashboard h3,
+body.admin-dashboard h4,
+body.admin-dashboard h5,
+body.admin-dashboard h6,
+body.admin-dashboard p,
+body.admin-dashboard span:not(.material-symbols-outlined):not([class*="material-symbols"]),
+body.admin-dashboard a:not(.material-symbols-outlined):not([class*="material-symbols"]),
+body.admin-dashboard button:not(.material-symbols-outlined):not([class*="material-symbols"]),
+body.admin-dashboard div:not(.material-symbols-outlined):not([class*="material-symbols"]),
+body.admin-dashboard input,
+body.admin-dashboard select,
+body.admin-dashboard textarea,
+body.admin-dashboard table,
+body.admin-dashboard th,
+body.admin-dashboard td,
+body.admin-dashboard label,
+body.admin-dashboard .font-headline,
+body.admin-dashboard .font-headline-xl,
+body.admin-dashboard .font-headline-lg,
+body.admin-dashboard .font-headline-md,
+body.admin-dashboard .font-headline-sm,
+body.admin-dashboard .font-title-lg,
+body.admin-dashboard .font-title-md,
+body.admin-dashboard .font-orbitron,
+body.admin-dashboard .font-display,
+body.admin-dashboard .font-mono,
+body.admin-dashboard .font-body,
+body.admin-dashboard .font-body-lg,
+body.admin-dashboard .font-body-md,
+body.admin-dashboard .font-body-sm,
+body.admin-dashboard .font-label-lg,
+body.admin-dashboard .font-label-md,
+body.admin-dashboard .font-label-sm,
+body.admin-dashboard .font-code-metric,
+body.admin-dashboard *:not(.material-symbols-outlined):not([class*="material-symbols"]) {
+  font-family: 'Chivo', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+body.admin-dashboard .material-symbols-outlined,
+body.admin-dashboard [class*="material-symbols"] {
+  font-family: 'Material Symbols Outlined' !important;
+}
+
+
+/* ======================================================== */
+/* 2. ICONOGRAPHY (MATERIAL SYMBOLS OUTLINED)               */
+/* ======================================================== */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  vertical-align: middle;
+}
+
+.material-symbols-outlined[data-weight='fill'] {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* ======================================================== */
+/* 3. CYBER GRID PATTERNS & BACKGROUNDS                     */
+/* ======================================================== */
+.cyber-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(168, 85, 247, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.cyber-grid-bg {
+  background-color: #080b11;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, rgba(181, 55, 242, 0.12) 0%, transparent 70%);
+  background-size: 36px 36px, 36px 36px, 100% 100%;
+}
+
+.cyber-hex-pattern {
+  background-color: #080b11;
+  background-image: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.07) 0%, transparent 60%);
+}
+
+/* ======================================================== */
+/* 4. TACTICAL NEON GLOWS                                   */
+/* ======================================================== */
+.glow-cyan {
+  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.45);
+}
+
+.glow-cyan-sm {
+  box-shadow: 0 0 10px -1px rgba(0, 240, 255, 0.4);
+}
+
+.glow-cyan-lg {
+  box-shadow:
+    0 0 35px 2px rgba(0, 240, 255, 0.3),
+    inset 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.glow-magenta {
+  box-shadow: 0 0 25px -4px rgba(255, 0, 127, 0.45);
+}
+
+.glow-purple {
+  box-shadow: 0 0 25px -4px rgba(181, 55, 242, 0.45);
+}
+
+.glow-green {
+  box-shadow: 0 0 16px -2px rgba(0, 255, 163, 0.45);
+}
+
+.neon-cyan-glow {
+  box-shadow:
+    0 0 25px rgba(0, 240, 255, 0.4),
+    inset 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.neon-purple-glow {
+  box-shadow:
+    0 0 30px rgba(192, 132, 252, 0.35),
+    inset 0 0 10px rgba(192, 132, 252, 0.15);
+}
+
+/* ======================================================== */
+/* 5. TACTICAL BUTTONS & CHAMFER CUTS                       */
+/* ======================================================== */
+.btn-cyber-primary {
+  background: linear-gradient(135deg, #00f0ff 0%, #00b4d8 100%);
+  box-shadow:
+    0 0 20px rgba(0, 240, 255, 0.5),
+    0 0 4px #00f0ff;
+}
+
+.btn-cyber-primary:hover {
+  box-shadow:
+    0 0 30px rgba(0, 240, 255, 0.8),
+    0 0 10px #00f0ff;
+}
+
+.gamer-cut-btn {
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+.hud-box {
+  clip-path: polygon(0 10px,
+      10px 0,
+      calc(100% - 10px) 0,
+      100% 10px,
+      100% calc(100% - 10px),
+      calc(100% - 10px) 100%,
+      10px 100%,
+      0 calc(100% - 10px));
+}
+
+.hud-card {
+  position: relative;
+}
+
+.hud-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.hud-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid #b537f2;
+  border-right: 2px solid #b537f2;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.tech-card-clip {
+  clip-path: polygon(0 0,
+      calc(100% - 14px) 0,
+      100% 14px,
+      100% 100%,
+      14px 100%,
+      0 calc(100% - 14px));
+}
+
+.tech-corner-accent {
+  position: relative;
+}
+
+.tech-corner-accent::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+}
+
+.tech-corner-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #c084fc;
+  border-right: 2px solid #c084fc;
+}
+
+/* ======================================================== */
+/* 6. SCANLINES & RADAR EFFECTS                             */
+/* ======================================================== */
+.radar-scanline {
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(0, 240, 255, 0.1) 50%,
+      transparent 100%);
+  animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(1000%);
+  }
+}
+
+.scanlines::after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 240, 255, 0.08) 50%);
+  background-size: 100% 4px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* ======================================================== */
+/* 7. CUSTOM SCROLLBAR                                      */
+/* ======================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #090d14;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
