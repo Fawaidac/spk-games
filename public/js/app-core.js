@@ -56,120 +56,18 @@ window.addEventListener('keydown', function (event) {
 // 2. ADMIN DASHBOARD MODUL TAB SWITCHER
 // ========================================================
 function switchAdminTab(tabName, event) {
-  if (event) {
-    event.preventDefault();
-  }
-
-  const validTabs = [
-    'dashboard',
-    'datagame',
-    'genre',
-    'import',
-    'pengguna',
-    'bantuan',
-    'pengaturan'
-  ];
-  if (!validTabs.includes(tabName)) {
-    tabName = 'dashboard';
-  }
-
-  // Sembunyikan semua pane tab modul
-  document.querySelectorAll('.admin-tab-pane').forEach(function (pane) {
-    pane.classList.add('hidden');
-  });
-
-  // Tampilkan pane target
-  const targetPane = document.getElementById('tab-content-' + tabName);
-  if (targetPane) {
-    targetPane.classList.remove('hidden');
-  }
-
-  // Perbarui styling navigasi di sidebar
-  document.querySelectorAll('.admin-nav-item').forEach(function (link) {
-    const itemTab = link.getAttribute('data-tab');
-    const isCurrent = itemTab === tabName;
-
-    if (isCurrent) {
-      link.classList.add(
-        'bg-gradient-to-r',
-        'from-primary/15',
-        'via-surface-container',
-        'to-transparent',
-        'text-primary',
-        'font-bold',
-        'border-l-4',
-        'border-primary',
-        'shadow-sm',
-        'glow-cyan-sm'
-      );
-      link.classList.remove('text-on-surface-variant', 'font-medium');
-      const badge = link.querySelector('.tab-badge-active');
-      if (badge) badge.classList.remove('hidden');
-    } else {
-      link.classList.remove(
-        'bg-gradient-to-r',
-        'from-primary/15',
-        'via-surface-container',
-        'to-transparent',
-        'text-primary',
-        'font-bold',
-        'border-l-4',
-        'border-primary',
-        'shadow-sm',
-        'glow-cyan-sm'
-      );
-      link.classList.add('text-on-surface-variant', 'font-medium');
-      const badge = link.querySelector('.tab-badge-active');
-      if (badge && itemTab === 'dashboard') badge.classList.add('hidden');
+  // Tab switching is now managed by dedicated Laravel routes
+  const panes = document.querySelectorAll('.admin-tab-pane');
+  if (panes.length > 1) {
+    if (event) event.preventDefault();
+    panes.forEach(function (pane) {
+      pane.classList.add('hidden');
+    });
+    const targetPane = document.getElementById('tab-content-' + tabName);
+    if (targetPane) {
+      targetPane.classList.remove('hidden');
     }
-  });
-
-  // Sinkronisasi Judul & Subtitle Header Top Command Bar
-  const titleEl = document.getElementById('admin-header-title');
-  const subEl = document.getElementById('admin-header-subtitle');
-  const tabMeta = {
-    dashboard: {
-      title: 'Konsol Administrasi & Mesin Rekomendasi ML',
-      sub: 'Manajemen pipeline dataset Steam Kaggle & matriks Cosine Similarity'
-    },
-    datagame: {
-      title: 'Katalog & Manajemen Data Game PC',
-      sub: 'Eksplorasi, kurasi, dan manajemen metadata 52.840 game Steam'
-    },
-    genre: {
-      title: 'Klasifikasi & Taksonomi 32 Genre Game',
-      sub: 'Peta sebaran kategori, bobot vektor TF-IDF, dan standarisasi genre'
-    },
-    import: {
-      title: 'Pipeline Ingesti Dataset Steam Kaggle',
-      sub: 'Unggah batch CSV, pemetaan atribut kolom, dan sinkronisasi vektor'
-    },
-    pengguna: {
-      title: 'Kontrol Akses & Manajemen Akun Pengguna',
-      sub: 'Daftar pengguna terdaftar, verifikasi akun, dan pengaturan role SuperAdmin'
-    },
-    bantuan: {
-      title: 'Terminal Bantuan & Dokumentasi Sistem ML',
-      sub: 'Spesifikasi arsitektur Content-Based Filtering dan format dataset'
-    },
-    pengaturan: {
-      title: 'Konfigurasi Mesin Rekomendasi & Algoritma',
-      sub: 'Parameter Cosine Similarity, batasan TF-IDF, dan optimasi performa'
-    }
-  };
-
-  if (titleEl && tabMeta[tabName]) titleEl.textContent = tabMeta[tabName].title;
-  if (subEl && tabMeta[tabName]) subEl.textContent = tabMeta[tabName].sub;
-
-  // Perbarui URL hash tanpa lompatan scroll yang kasar
-  if (window.history && window.history.replaceState) {
-    window.history.replaceState(null, null, '#' + tabName);
-  } else {
-    window.location.hash = '#' + tabName;
   }
-
-  // Scroll ke atas secara halus
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ========================================================
@@ -245,13 +143,5 @@ function closeModalGenre() {
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener('DOMContentLoaded', function () {
-  if (document.getElementById('admin-nav-list')) {
-    const activeHash = window.location.hash.replace('#', '') || 'dashboard';
-    switchAdminTab(activeHash);
-
-    window.addEventListener('hashchange', function () {
-      const newHash = window.location.hash.replace('#', '') || 'dashboard';
-      switchAdminTab(newHash);
-    });
-  }
+  // Event listeners siap
 });

@@ -4,16 +4,24 @@
     <div class="flex items-center gap-2">
       <span class="w-2 h-2 rounded bg-primary"></span>
       <h1 id="admin-header-title" class="font-headline font-bold text-xl text-white tracking-wide uppercase flex items-center gap-2">
-        Konsol Administrasi &amp; Mesin Rekomendasi ML
+        @yield('header-title', 'Konsol Administrasi & Mesin Rekomendasi ML')
       </h1>
     </div>
     <p id="admin-header-subtitle" class="font-mono text-xs text-on-surface-variant mt-0.5 tracking-tight">
-      Manajemen pipeline dataset Steam Kaggle &amp; matriks Cosine Similarity
+      @yield('header-subtitle', 'Manajemen pipeline dataset Steam Kaggle & matriks Cosine Similarity')
     </p>
   </div>
-  <div class="flex items-center gap-5">
+  <div class="flex items-center gap-4">
+    <!-- Tombol Navigasi ke Landing Page -->
+    <a href="{{ route('landing') }}"
+       class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container border border-primary/40 hover:border-primary text-primary hover:bg-primary/10 transition-all text-xs font-mono font-bold uppercase tracking-wider shadow-sm hover:glow-cyan-sm group"
+       title="Kembali ke Landing Page Publik">
+      <span class="material-symbols-outlined text-[16px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+      <span>Landing Page</span>
+    </a>
+
     <!-- Neon Pulse Engine Status (Tactical Armed & Ready) -->
-    <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface-container-low border border-tertiary/40 glow-green">
+    <div class="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface-container-low border border-tertiary/40 glow-green">
       <span class="relative flex h-2.5 w-2.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-80"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary"></span>
@@ -22,15 +30,7 @@
         ML COSINE ENGINE: ARMED &amp; READY
       </span>
     </div>
-    <!-- Link Langsung ke Portal Gamer & Beranda -->
-    <!-- <a href="{{ route('dashboard.user') }}" onclick="if(window.GameMatchFlow) GameMatchFlow.ensureUserSession(event)" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-primary/40 hover:border-primary text-primary hover:bg-primary/10 transition-all text-xs font-mono font-bold uppercase tracking-wider shadow-sm hover:glow-cyan-sm" title="Buka Tampilan Portal Pengguna / Gamer">
-      <span class="material-symbols-outlined text-[16px]">sports_esports</span>
-      <span>Portal Gamer</span>
-    </a> -->
-    <!-- <a href="{{ route('landing') }}" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant hover:border-white/30 text-on-surface-variant hover:text-white transition-all text-xs font-mono tracking-wider uppercase" title="Ke Beranda Publik">
-      <span class="material-symbols-outlined text-[16px]">home</span>
-      <span>Beranda</span>
-    </a> -->
+
     <!-- Live Broadcast / Alert Beacon -->
     <button class="relative p-2 rounded-lg text-on-surface-variant hover:text-primary bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-all">
       <span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>

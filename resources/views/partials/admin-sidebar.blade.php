@@ -33,61 +33,42 @@
         Konsol Modul
       </div>
       <!-- Dashboard -->
-      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg bg-gradient-to-r from-primary/15 via-surface-container to-transparent text-primary font-bold border-l-4 border-primary shadow-sm glow-cyan-sm transition-all"
-         href="#dashboard"
-         data-tab="dashboard"
-         onclick="switchAdminTab('dashboard', event)">
+      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-primary/15 via-surface-container to-transparent text-primary font-bold border-l-4 border-primary shadow-sm glow-cyan-sm' : 'text-on-surface-variant font-medium hover:bg-surface-container hover:text-primary hover:border-l-2 hover:border-primary/50 group' }}"
+         href="{{ route('admin.dashboard') }}">
         <span class="material-symbols-outlined text-primary" data-icon="dashboard">dashboard</span>
         <span class="text-sm tracking-wide">Dashboard</span>
-        <!-- <span class="tab-badge-active ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30">ONLINE</span> -->
       </a>
       <!-- Data Game -->
-      <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container hover:text-primary hover:border-l-2 hover:border-primary/50 transition-all group"
-         href="#datagame"
-         data-tab="datagame"
-         onclick="switchAdminTab('datagame', event)">
+      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.games') ? 'bg-gradient-to-r from-primary/15 via-surface-container to-transparent text-primary font-bold border-l-4 border-primary shadow-sm glow-cyan-sm' : 'text-on-surface-variant font-medium hover:bg-surface-container hover:text-primary hover:border-l-2 hover:border-primary/50 group' }}"
+         href="{{ route('admin.games') }}">
         <span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="stadia_controller">stadia_controller</span>
         <span class="text-sm tracking-wide">Data Game</span>
-        <!-- <span class="ml-auto text-[10px] font-mono text-outline group-hover:text-primary">52K</span> -->
       </a>
       <!-- Genre -->
-      <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary/50 transition-all group"
-         href="#genre"
-         data-tab="genre"
-         onclick="switchAdminTab('genre', event)">
+      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.genres') ? 'bg-gradient-to-r from-secondary/15 via-surface-container to-transparent text-secondary font-bold border-l-4 border-secondary shadow-sm transition-all' : 'text-on-surface-variant font-medium hover:bg-surface-container hover:text-secondary hover:border-l-2 hover:border-secondary/50 group' }}"
+         href="{{ route('admin.genres') }}">
         <span class="material-symbols-outlined group-hover:text-secondary transition-colors" data-icon="category">category</span>
         <span class="text-sm tracking-wide">Genre</span>
-        <!-- <span class="ml-auto text-[10px] font-mono text-outline group-hover:text-secondary">32</span> -->
       </a>
-      <!-- Import Dataset -->
-      <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container hover:text-tertiary hover:border-l-2 hover:border-tertiary/50 transition-all group"
-         href="#import"
-         data-tab="import"
-         onclick="switchAdminTab('import', event)">
-        <span class="material-symbols-outlined group-hover:text-tertiary transition-colors" data-icon="upload_file">upload_file</span>
-        <span class="text-sm tracking-wide">Import Dataset</span>
-        <!-- <span class="ml-auto w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> -->
+      <!-- History Rekomendasi -->
+      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.history') ? 'bg-gradient-to-r from-tertiary/15 via-surface-container to-transparent text-tertiary font-bold border-l-4 border-tertiary shadow-sm transition-all' : 'text-on-surface-variant font-medium hover:bg-surface-container hover:text-tertiary hover:border-l-2 hover:border-tertiary/50 group' }}"
+         href="{{ route('admin.history') }}">
+        <span class="material-symbols-outlined group-hover:text-tertiary transition-colors" data-icon="history">history</span>
+        <span class="text-sm tracking-wide">History</span>
       </a>
       <!-- Pengguna -->
-      <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container hover:text-white hover:border-l-2 hover:border-white/50 transition-all group"
-         href="#pengguna"
-         data-tab="pengguna"
-         onclick="switchAdminTab('pengguna', event)">
+      <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.users') ? 'bg-gradient-to-r from-primary/15 via-surface-container to-transparent text-white font-bold border-l-4 border-white shadow-sm transition-all' : 'text-on-surface-variant font-medium hover:bg-surface-container hover:text-white hover:border-l-2 hover:border-white/50 group' }}"
+         href="{{ route('admin.users') }}">
         <span class="material-symbols-outlined group-hover:text-white transition-colors" data-icon="group">group</span>
         <span class="text-sm tracking-wide">Pengguna</span>
-        <!-- <span class="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant">{{ $totalUsers ?? 4 }}</span> -->
       </a>
-      <!-- Link Terhubung: Portal Gamer -->
-      <!-- <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-primary/90 font-medium hover:bg-surface-container hover:text-primary hover:border-l-2 hover:border-primary transition-all group" href="{{ route('dashboard.user') }}" onclick="if(window.GameMatchFlow) GameMatchFlow.ensureUserSession(event)" title="Lihat Tampilan Sisi Gamer">
-        <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="sports_esports">sports_esports</span>
-        <span class="text-sm tracking-wide">Portal Gamer</span>
-        <span class="ml-auto text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30">USER VIEW</span>
-      </a> -->
-      <!-- Link Terhubung: Landing Page -->
-      <!-- <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container hover:text-white hover:border-l-2 hover:border-outline transition-all group" href="{{ route('landing') }}" title="Kembali ke Landing Page Utama">
-        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-white transition-colors" data-icon="public">public</span>
-        <span class="text-sm tracking-wide">Landing Page</span>
-        <span class="ml-auto text-[9px] font-mono text-outline group-hover:text-white">BERANDA</span>
+      <!-- Import Dataset (Dinonaktifkan / Arsip) -->
+      <!-- <a class="admin-nav-item relative flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container/40 group text-xs opacity-75 {{ request()->routeIs('admin.imports') ? 'bg-surface-container text-white' : '' }}"
+         href="{{ route('admin.imports') }}"
+         title="Modul Import Dataset dinonaktifkan sementara">
+        <span class="material-symbols-outlined text-[18px] group-hover:text-on-surface-variant transition-colors" data-icon="upload_file">upload_file</span>
+        <span class="tracking-wide">Import Dataset</span>
+        <span class="ml-auto text-[8px] font-mono px-1 py-0.2 rounded bg-surface-container border border-outline-variant text-on-surface-variant/70">NONAKTIF</span>
       </a> -->
     </nav>
   </div>
@@ -96,17 +77,21 @@
     <div class="px-2 pb-1 text-[10px] font-mono uppercase tracking-widest text-outline">
       Terminal Link
     </div>
-    <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-white transition-all text-xs"
-       href="#bantuan"
-       data-tab="bantuan"
-       onclick="switchAdminTab('bantuan', event)">
+    <!-- Navigasi ke Landing Page -->
+    <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs text-primary/90 hover:bg-primary/10 hover:text-primary border border-primary/25 hover:border-primary/50 group"
+       href="{{ route('landing') }}"
+       title="Kembali ke Landing Page Publik">
+      <!-- <span class="material-symbols-outlined text-[18px] text-primary group-hover:-translate-x-0.5 transition-transform" data-icon="arrow_back">arrow_back</span> -->
+      <span class="font-bold">Landing Page</span>
+      <span class="ml-auto text-[9px] font-mono px-1.5 py-0.2 rounded bg-primary/20 text-primary border border-primary/30">BERANDA</span>
+    </a>
+    <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs {{ request()->routeIs('admin.help') ? 'bg-gradient-to-r from-primary/15 via-surface-container to-transparent text-primary font-bold border-l-4 border-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-white' }}"
+       href="{{ route('admin.help') }}">
       <span class="material-symbols-outlined text-[18px]" data-icon="terminal">terminal</span>
       <span>Bantuan</span>
     </a>
-    <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-white transition-all text-xs"
-       href="#pengaturan"
-       data-tab="pengaturan"
-       onclick="switchAdminTab('pengaturan', event)">
+    <a class="admin-nav-item flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs {{ request()->routeIs('admin.settings') ? 'bg-gradient-to-r from-secondary/15 via-surface-container to-transparent text-secondary font-bold border-l-4 border-secondary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-white' }}"
+       href="{{ route('admin.settings') }}">
       <span class="material-symbols-outlined text-[18px]" data-icon="settings">settings</span>
       <span>Pengaturan</span>
     </a>

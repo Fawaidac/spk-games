@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('genres', function (Blueprint $table) {
-            $table->id();
+           $table->id();
             $table->string('name', 100)->unique();
             $table->string('slug', 120)->unique();
-            // true = tampil sebagai chip pilihan genre di halaman Preferensi
             $table->boolean('is_main')->default(false);
             $table->timestamps();
         });

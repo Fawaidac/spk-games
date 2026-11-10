@@ -71,4 +71,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Genre::class, 'user_genres', 'user_id', 'genre_id');
     }
+
+    /**
+     * Riwayat kalkulasi rekomendasi yang dilakukan user.
+     */
+    public function recommendationHistories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RecommendationHistory::class);
+    }
 }

@@ -155,7 +155,7 @@
       <div class="flex items-center gap-2">
         @auth
           @if(auth()->user()->isAdmin())
-            <a href="{{ route('dashboard.admin') }}"
+            <a href="{{ route('admin.dashboard') }}"
                class="px-4 py-2 rounded border border-secondary/40 hover:border-secondary text-secondary hover:bg-secondary/10 text-xs font-label-md uppercase tracking-wider font-bold transition-all flex items-center gap-1.5">
               <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
               Analisis di Admin ML

@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name'              => 'Super Admin',
                 'email'             => 'admin@gmail.com',
-                'password'          => Hash::make('admin12345'),
+                'password'          => Hash::make('password'),
                 'role'              => 'admin',
                 'email_verified_at' => now(),
             ]
@@ -29,22 +29,22 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name'              => 'Budi Santoso',
-                'email'             => 'budi@example.com',
-                'password'          => Hash::make('user12345'),
+                'email'             => 'user@gmail.com',
+                'password'          => Hash::make('password'),
                 'role'              => 'user',
                 'email_verified_at' => now(),
             ],
             [
                 'name'              => 'Siti Rahayu',
-                'email'             => 'siti@example.com',
-                'password'          => Hash::make('user12345'),
+                'email'             => 'siti@gmail.com',
+                'password'          => Hash::make('password'),
                 'role'              => 'user',
                 'email_verified_at' => now(),
             ],
             [
                 'name'              => 'Rizky Pratama',
-                'email'             => 'rizky@example.com',
-                'password'          => Hash::make('user12345'),
+                'email'             => 'user2@gmail.com',
+                'password'          => Hash::make('password'),
                 'role'              => 'user',
                 'email_verified_at' => now(),
             ],
@@ -61,10 +61,10 @@ class UserSeeder extends Seeder
         $this->command->table(
             ['Role', 'Email', 'Password'],
             [
-                ['admin', 'admin@gmail.com', 'admin12345'],
-                ['user',  'budi@example.com',   'user12345'],
-                ['user',  'siti@example.com',   'user12345'],
-                ['user',  'rizky@example.com',  'user12345'],
+                ['admin', 'admin@gmail.com', 'password'],
+                ['user',  'user@gmail.com',   'password'],
+                ['user',  'user2@gmail.com',   'password'],
+                ['user',  'user3@gmail.com',  'password'],
             ]
         );
     }

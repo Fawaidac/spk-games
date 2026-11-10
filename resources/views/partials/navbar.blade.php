@@ -19,20 +19,17 @@
     </a>
 
     <!-- Desktop Navigation Links -->
-    <nav class="hidden md:flex items-center gap-8 font-label-md text-xs tracking-wider uppercase">
-      <a class="text-primary border-b-2 border-primary pb-1 font-bold flex items-center gap-1.5 transition-colors duration-200 drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]" href="{{ route('landing') }}#hero">
-        <span class="text-primary font-mono text-[10px]"></span> Beranda
+    <nav class="hidden md:flex items-center gap-8 font-label-md text-xs tracking-wider uppercase" id="landing-navbar-nav">
+      <a class="nav-section-link text-primary border-b-2 border-primary pb-1 font-bold flex items-center gap-1.5 transition-all duration-200 drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]" data-section="hero" href="{{ route('landing') }}#hero">
+        Beranda
       </a>
-      <a class="text-on-surface-variant hover:text-primary font-medium transition-colors duration-200 flex items-center gap-1.5" href="{{ route('landing') }}#cara-kerja">
-        <span class="text-on-surface-variant/60 font-mono text-[10px]"></span>
+      <a class="nav-section-link text-on-surface-variant hover:text-primary font-medium transition-all duration-200 flex items-center gap-1.5 pb-1 border-b-2 border-transparent" data-section="cara-kerja" href="{{ route('landing') }}#cara-kerja">
         Cara Kerja
       </a>
-      <a class="text-on-surface-variant hover:text-primary font-medium transition-colors duration-200 flex items-center gap-1.5" href="{{ route('landing') }}#rekomendasi">
-        <span class="text-on-surface-variant/60 font-mono text-[10px]"></span>
+      <a class="nav-section-link text-on-surface-variant hover:text-primary font-medium transition-all duration-200 flex items-center gap-1.5 pb-1 border-b-2 border-transparent" data-section="rekomendasi" href="{{ route('landing') }}#rekomendasi">
         Rekomendasi
       </a>
-      <a class="text-on-surface-variant hover:text-primary font-medium transition-colors duration-200 flex items-center gap-1.5" href="{{ route('landing') }}#tentang">
-        <span class="text-on-surface-variant/60 font-mono text-[10px]"></span>
+      <a class="nav-section-link text-on-surface-variant hover:text-primary font-medium transition-all duration-200 flex items-center gap-1.5 pb-1 border-b-2 border-transparent" data-section="tentang" href="{{ route('landing') }}#tentang">
         Tentang
       </a>
     </nav>
@@ -43,7 +40,7 @@
         {{-- ── Admin Only: Tombol Admin ML ── --}}
         @if(auth()->user()->isAdmin())
           <a class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-secondary/50 hover:border-secondary text-secondary hover:bg-secondary/10 text-[11px] font-label-md tracking-wider uppercase transition-all shadow-[0_0_10px_rgba(192,132,252,0.2)] hover:shadow-[0_0_15px_rgba(192,132,252,0.4)]"
-             href="{{ route('dashboard.admin') }}"
+             href="{{ route('admin.dashboard') }}"
              title="Buka Konsol Algoritma ML Admin">
             <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
             <span>Admin ML</span>
@@ -102,7 +99,7 @@
               </button>
               @if(auth()->user()->isAdmin())
                 <div class="my-1 border-t border-[#1e293b]"></div>
-                <a href="{{ route('dashboard.admin') }}"
+                <a href="{{ route('admin.dashboard') }}"
                    class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:text-white hover:bg-secondary/10 transition-colors text-sm">
                   <span class="material-symbols-outlined text-base text-secondary">admin_panel_settings</span>
                   Konsol Admin ML
@@ -133,3 +130,65 @@
     </div>
   </div>
 </header>
+
+{{-- ── Scroll Spy Script untuk Topbar Landing Page ── --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionIds = ['hero', 'cara-kerja', 'rekomendasi', 'tentang'];
+    const navLinks = document.querySelectorAll('#landing-navbar-nav .nav-section-link');
+    if (!navLinks.length) return;
+
+    function setActiveLink(activeId) {
+      navLinks.forEach(function (link) {
+        const isMatch = link.getAttribute('data-section') === activeId;
+        if (isMatch) {
+          link.classList.add('text-primary', 'border-primary', 'font-bold', 'drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]');
+          link.classList.remove('text-on-surface-variant', 'border-transparent', 'font-medium');
+        } else {
+          link.classList.remove('text-primary', 'border-primary', 'font-bold', 'drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]');
+          link.classList.add('text-on-surface-variant', 'border-transparent', 'font-medium');
+        }
+      });
+    }
+
+    function onScroll() {
+      const scrollY = window.scrollY;
+      const navOffset = 180;
+      let currentSection = 'hero';
+
+      sectionIds.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop - navOffset;
+          const height = el.offsetHeight;
+          if (scrollY >= top && scrollY < top + height) {
+            currentSection = id;
+          }
+        }
+      });
+
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 60)) {
+        currentSection = 'tentang';
+      }
+
+      setActiveLink(currentSection);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('data-section');
+        const targetEl = document.getElementById(targetId);
+        if (targetEl && (window.location.pathname === '/' || window.location.pathname === '')) {
+          e.preventDefault();
+          const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - 75;
+          window.scrollTo({ top: targetTop, behavior: 'smooth' });
+          history.pushState(null, null, '#' + targetId);
+          setActiveLink(targetId);
+        }
+      });
+    });
+  });
+</script>

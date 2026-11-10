@@ -426,7 +426,7 @@
                             </button>
                             @if (auth()->user()->isAdmin())
                                 <a
-                                    href="{{ route('dashboard.admin') }}"
+                                    href="{{ route('admin.dashboard') }}"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-secondary/40 hover:border-secondary text-secondary hover:bg-secondary/10 text-xs font-code-metric uppercase tracking-wider transition-all"
                                 >
                                     <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
@@ -522,37 +522,23 @@
 
                         <div class="flex flex-wrap gap-2.5" id="genre-filter-chips">
                             @php
-                                $genres = [
-                                    'Action',
-                                    'RPG',
-                                    'Open World',
-                                    'Souls-like',
-                                    'Strategy',
-                                    'Story Rich',
-                                    'Roguelike',
-                                    'Indie',
-                                    'Simulation',
-                                    'Shooter',
-                                    'Horror',
-                                    'Puzzle',
-                                ];
-                                $defaultActiveGenres = ['Action', 'RPG', 'Open World', 'Souls-like'];
+                                $defaultActiveGenres = ['Action', 'RPG', 'Strategy', 'Adventure'];
                             @endphp
                             @foreach ($genres as $genre)
                                 @php
-                                    $isDefaultActive = in_array($genre, $defaultActiveGenres);
+                                    $isDefaultActive = in_array($genre->name, $defaultActiveGenres);
                                 @endphp
                                 <button
                                     type="button"
                                     onclick="toggleGenreChip(this)"
-                                    data-genre="{{ $genre }}"
+                                    data-genre="{{ $genre->name }}"
                                     class="genre-chip px-3.5 py-1.5 rounded-full border text-xs font-code-metric tracking-wide transition-all duration-150 flex items-center gap-1.5 {{ $isDefaultActive ? 'bg-primary text-[#002022] font-bold border-primary shadow-[0_0_12px_rgba(0,240,255,0.4)]' : 'border-[#1e293b] text-on-surface-variant hover:border-primary/60 hover:text-primary bg-surface-container/60' }}"
                                 >
                                     <span
                                         class="material-symbols-outlined text-xs {{ $isDefaultActive ? 'inline' : 'hidden' }} chip-check"
                                         >check</span
                                     >
-                                    <span>{{ $genre }}</span>
+                                    <span>{{ $genre->name }}</span>
                                 </button>
                             @endforeach
                         </div>
@@ -561,158 +547,116 @@
                     <!-- LANGKAH 2: Pilih Game Favorit (Basis Kalkulasi Vektor) -->
                     <div class="space-y-3 pt-4 border-t border-[#1e293b]">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <label
-                                class="text-xs font-code-metric uppercase tracking-wider text-primary font-bold flex items-center gap-1.5"
-                            >
-                                <span
-                                    class="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center text-[11px] text-primary font-bold"
-                                    >2</span
-                                >
+                            <label class="text-xs font-code-metric uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                                <span class="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center text-[11px] text-primary font-bold">2</span>
                                 <span>Pilih Game Favorit Sebagai Basis Referensi Vektor:</span>
                             </label>
-                            <span
-                                id="fav-games-count-badge"
-                                class="px-2.5 py-0.5 rounded text-[11px] font-code-metric font-bold bg-secondary/20 text-secondary border border-secondary/40"
-                            >
-                                3 Game Terpilih
+                            <span id="fav-games-count-badge" class="px-2.5 py-0.5 rounded text-[11px] font-code-metric font-bold bg-secondary/20 text-secondary border border-secondary/40">
+                                0 Game Terpilih
                             </span>
                         </div>
 
-                        <!-- Search Bar Referensi Game -->
-                        <div class="relative group">
-                            <span
-                                class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-primary text-lg pointer-events-none"
-                                >search</span
-                            >
-                            <input
-                                id="search-ref-game"
-                                oninput="filterReferenceGames(this.value)"
-                                class="w-full pl-10 pr-24 py-2.5 rounded-lg bg-[#080b11] border-2 border-primary/30 text-white placeholder-on-surface-variant/50 font-body-md text-xs focus:border-primary focus:glow-cyan focus:outline-none transition-all duration-200"
-                                placeholder="Ketik untuk mencari game favorit referensi (misal: Cyberpunk, Elden Ring, Hades)..."
-                                type="text"
-                            />
-                            <span
-                                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-primary/60 border border-primary/30 px-1.5 py-0.5 rounded hidden sm:block"
-                            >
-                                FILTER LIVE
-                            </span>
-                        </div>
-
-                        <!-- Grid Game Referensi Favorit yang Dapat Dipilih -->
-                        <div
-                            class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3.5 pt-1"
-                            id="reference-games-grid"
-                        >
-                            @php
-                                $refGames = [
-                                    [
-                                        'id' => 'ref-cyberpunk',
-                                        'title' => 'Cyberpunk 2077',
-                                        'studio' => 'CD PROJEKT RED',
-                                        'genres' => 'RPG, Open World, Shooter, Action',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuAQjPavzwmRZx2cqfOCfH8v3nlw6Bx-Ea4jkzGG22O1Pa9BkPcK6IFN4cHuORgWSrpcUR7gGEgrb-RKSa0QLSy8MrRxl9-FWp2vBpyt4Ee3PwPyl-oa7ypP5Gfl5m7lz42Lrwk5bDRTzNlbZ3jRmeAmGQPAhw_KwHx38hpvW27WMR7CsajiOPFQbI-iVrZqXr_lhpbBBZ1sAKS3wnb-Ozz3A0kqwrzBuDsQLKm9VBfOrUt3bTy1-orh',
-                                        'selected' => true,
-                                    ],
-                                    [
-                                        'id' => 'ref-eldenring',
-                                        'title' => 'Elden Ring',
-                                        'studio' => 'FromSoftware',
-                                        'genres' => 'Souls-like, Dark Fantasy, RPG, Action',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuDOnLaBUJanpII9wbcWasXlESOwboVv6hWa-BE-FPKqdbzLLLktqifw3ZFMx_lcG5PEZhzeILH2bdhFe__6MEwbfjy20co7xVJ2Bgevyy2N8IFBlpEtzCZSS0EZtQEcZBTaMxxNh-k1tbiuNx94c_cKjlXqERR0cYsfXnGOlS1Txiwt-BwIh8V7xeL_YhNKC_q64WAUzEvWYSmtQgvuCiKYRwUkaSpnD52k5Wm6ev3_VDZFfmHidt7P',
-                                        'selected' => true,
-                                    ],
-                                    [
-                                        'id' => 'ref-baldursgate',
-                                        'title' => "Baldur's Gate 3",
-                                        'studio' => 'Larian Studios',
-                                        'genres' => 'RPG, Story Rich, Strategy',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuAIfr9TS6q6K97q9lpWA1BXY0X5kE6LigC4X1vZDVZRKAS0Q6jlcWywTlVh7f4FKu1EAahzE36VFdjreYIg7b5yyOxgiJ5QJm-XLZFWfatLIacgfJKJTHjhkEG_oWunQZPjHr8GIOvAcMIWD_OCi0azois8IUdEfcFcdDYSYqRj_6crdPw7zOXbaWudI5hcQHcijku4Cn61P67g9Fvy-iuZpThPrU6kxaByHw0Mk055VAM6-HG69va-',
-                                        'selected' => true,
-                                    ],
-                                    [
-                                        'id' => 'ref-witcher3',
-                                        'title' => 'The Witcher 3',
-                                        'studio' => 'CD PROJEKT RED',
-                                        'genres' => 'RPG, Open World, Action',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuCwemg0Lreg0jbncfqAkBpEFV8lnBULopgIWVbQNRcb2a_7QyuknvpijBRM02q9tyDWUgBJo0FtFnhEXntq0NOVNefbRQHq5v7qbbMHpe-aKTOfwXJR5kNajVYaEuqvciAbdW1SP6wAwkkEf9uRadpV8HGboJ8QUCzsC_-3CfNol_q27BT7IWtbzEZlr9EFC3q2PR4DzW69H_QEqAHdQ91OOJ0ADxK5bY-lTDK8B3wfNbEKGqjVoQW3',
-                                        'selected' => false,
-                                    ],
-                                    [
-                                        'id' => 'ref-hades',
-                                        'title' => 'Hades',
-                                        'studio' => 'Supergiant Games',
-                                        'genres' => 'Roguelike, Action, Indie',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuAA_oR1WnFa9dMp_IJs43GUkSOiC9MJzzs6WK21UW4AbSf-Ic2OTAqdalaqpNj90kB04OLe-N2pWwxfPejlloiDd9DWzmXUH865xUWYGKgeE3ZWApJ4kVGln5bhTtgmsow962czgzc-pSCsaHA78T8r55dCrRji_k27rlxiYgcx8O1ZDquvRACF9OhBAMQU6QVKjOUW-RZaku-9s3GSHG065bCbBF7mgMch-vG9b9G8zoQKxfgMgwfb',
-                                        'selected' => false,
-                                    ],
-                                    [
-                                        'id' => 'ref-rdr2',
-                                        'title' => 'Red Dead Redemption 2',
-                                        'studio' => 'Rockstar Games',
-                                        'genres' => 'Open World, Story Rich, Action',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuBt3kRWe3gqcgNUP7sHXAT6by2CXp7l8gsSWnHhCmjBFYrMKM9JCW570BZT7NoPCWp48iUX5nxmxFkLmstMLFn2WpRCEVLG7CwXSFlaHlyJu8B4amE4kJQgDeSRBkKRrlMKC9Y2-QgIo-LpvNKEcNFTps_qgustrhfblJU9yeLJNPkxsOhjx-4j9l-VHN5dBbTebg_LkKl0jcmZur1KmYpZD-hN8mKgVq92Dj-LELMoHrP23r6n0NNk',
-                                        'selected' => false,
-                                    ],
-                                    [
-                                        'id' => 'ref-godofwar',
-                                        'title' => 'God of War',
-                                        'studio' => 'Santa Monica Studio',
-                                        'genres' => 'Action, Mythology, Story Rich',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuDtYx5wxB1xfQm6WhsyK72oYqA815YA3ekhXkSieWr4nzC7nuRcGsL8xCZUwDUkM5j5pLl4uOOVenR1FfekslRzGyb_eosSBz8lZHddEXlPTyBfVW0jj5swVuDSRrRTikElYp8m0-A8sPpQVbrBw3X50YWmPHyapYh5g9FQmIFn2m3oFh8HNBmDkZO3QXC7mFNMpAL1u6dapuZ3ZTCTiiOCfesyNo_d8B4J1nfIjKdlMUv1Z0LWp4M-',
-                                        'selected' => false,
-                                    ],
-                                    [
-                                        'id' => 'ref-mhw',
-                                        'title' => 'Monster Hunter: World',
-                                        'studio' => 'Capcom',
-                                        'genres' => 'Action, RPG, Co-op',
-                                        'img' =>
-                                            'https://lh3.googleusercontent.com/aida-public/AB6AXuDNswDdYr0ZNIizGj1u97PwBl2PV6Ob7YCS_VLwigiL4yGKMinkOdgJ5NBgw65FlsZhkLZkjQpmQPPxhoXncKv71t-czNfazGde-f17rJRzdEwZGK8xOUtPO-0ColF9uD73CEPAk2SPQHh9qll2GHbhmB5xkmYcK-AsvgToYdIv9UEsFonL_g1o_EzjFBjv2KqJaHz6GqfYwvIG96IFkUGRy3k3M2BtLN5tsetLJv0Xo7nD8vDsgADk',
-                                        'selected' => false,
-                                    ],
-                                ];
-                            @endphp
-
-                            @foreach ($refGames as $game)
-                                <div
-                                    onclick="toggleReferenceGame(this, '{{ $game['title'] }}')"
-                                    data-ref-title="{{ strtolower($game['title']) }}"
-                                    data-ref-genres="{{ strtolower($game['genres']) }}"
-                                    class="ref-game-card relative rounded-xl border p-2.5 bg-[#080b11] hover:border-primary/80 transition-all duration-200 cursor-pointer group flex flex-col justify-between select-none {{ $game['selected'] ? 'border-primary ring-1 ring-primary/80 bg-primary/5 shadow-[0_0_15px_rgba(0,240,255,0.25)]' : 'border-[#1e293b]' }}"
+                        <!-- Search & Filter Game Referensi (Server-side via GET) -->
+                        <form method="GET" action="{{ route('landing') }}#preferensi-section"
+                            class="flex flex-wrap items-center gap-2 text-xs font-code-metric">
+                            <!-- Pertahankan fragment agar tidak scroll ke atas -->
+                            <div class="relative flex-1 min-w-[180px]">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary text-base pointer-events-none">search</span>
+                                <input
+                                    type="text"
+                                    name="ref_search"
+                                    id="search-ref-game"
+                                    value="{{ $refSearch }}"
+                                    placeholder="Cari game favorit referensi (misal: Cyberpunk, Elden Ring...)..."
+                                    class="w-full pl-9 pr-4 py-2 rounded-lg bg-[#080b11] border-2 border-primary/30 text-white placeholder-on-surface-variant/50 text-xs focus:border-primary focus:outline-none transition-all"
+                                />
+                            </div>
+                            <!-- Dropdown Filter Genre -->
+                            <div class="relative">
+                                <select
+                                    name="ref_genre"
+                                    onchange="this.form.submit()"
+                                    class="bg-[#0f1422] border-2 border-primary/40 hover:border-primary text-primary font-bold text-xs font-code-metric rounded-lg px-3 py-2 pr-7 focus:border-primary focus:outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    <div class="relative aspect-[16/10] rounded-lg overflow-hidden mb-2">
+                                    <option value="all">Semua Genre</option>
+                                    @foreach ($genres as $g)
+                                        <option value="{{ $g->slug }}" {{ $refGenre == $g->slug || $refGenre == $g->name ? 'selected' : '' }}>
+                                            {{ $g->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-primary pointer-events-none text-sm">expand_more</span>
+                            </div>
+                            <button type="submit" class="px-3 py-2 rounded-lg bg-primary/10 border border-primary/40 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">filter_list</span>
+                                <span>Cari</span>
+                            </button>
+                            @if($refSearch || ($refGenre && $refGenre !== 'all'))
+                                <a href="{{ route('landing') }}#preferensi-section"
+                                    class="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                    <span>Reset</span>
+                                </a>
+                            @endif
+                        </form>
+
+                        <!-- Grid Game Referensi dari DB (8 per halaman) -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3.5 pt-1" id="reference-games-grid">
+                            @forelse ($refGames as $game)
+                                @php
+                                    $gameGenresStr = $game->genres->pluck('name')->implode(', ');
+                                @endphp
+                                <div
+                                    onclick="toggleReferenceGame(this, '{{ addslashes($game->title) }}')"
+                                    data-ref-title="{{ strtolower($game->title) }}"
+                                    data-ref-genres="{{ strtolower($gameGenresStr) }}"
+                                    class="ref-game-card relative rounded-xl border p-2.5 bg-[#080b11] hover:border-primary/80 transition-all duration-200 cursor-pointer group flex flex-col justify-between select-none border-[#1e293b]"
+                                >
+                                    <div class="relative aspect-[16/10] rounded-lg overflow-hidden mb-2 bg-black/60">
                                         <img
-                                            src="{{ $game['img'] }}"
-                                            alt="{{ $game['title'] }}"
+                                            src="{{ $game->image_url ?? 'https://placehold.co/160x90/0f1422/00f0ff?text=' . urlencode($game->title) }}"
+                                            alt="{{ $game->title }}"
+                                            loading="lazy"
+                                            onerror="this.onerror=null; this.src='https://placehold.co/160x90/0f1422/00f0ff?text=Steam';"
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
-                                        ></div>
-                                        <span
-                                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all check-indicator {{ $game['selected'] ? 'bg-primary text-[#002022] shadow-[0_0_8px_rgba(0,240,255,0.8)]' : 'bg-black/60 text-white/40 border border-white/20' }}"
-                                        >
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                        <span class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all check-indicator bg-black/60 text-white/40 border border-white/20">
                                             <span class="material-symbols-outlined text-sm font-bold">check</span>
                                         </span>
                                     </div>
                                     <div>
-                                        <h4
-                                            class="text-xs font-bold text-white truncate group-hover:text-primary transition-colors"
-                                        >
-                                            {{ $game['title'] }}
+                                        <h4 class="text-xs font-bold text-white truncate group-hover:text-primary transition-colors" title="{{ $game->title }}">
+                                            {{ $game->title }}
                                         </h4>
-                                        <p class="text-[10px] font-code-metric text-on-surface-variant truncate">{{ $game['studio'] }}</p>
+                                        <p class="text-[10px] font-code-metric text-on-surface-variant truncate">{{ $game->developers ?? 'Steam Game' }}</p>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="col-span-full py-10 text-center">
+                                    <span class="material-symbols-outlined text-3xl text-on-surface-variant/40 mb-2">search_off</span>
+                                    <p class="text-white text-sm font-bold">Game tidak ditemukan</p>
+                                    <p class="text-on-surface-variant text-xs mt-1">Coba kata kunci atau genre lain.</p>
+                                </div>
+                            @endforelse
                         </div>
+
+                        <!-- Pagination Bar Referensi Game (8 per halaman) -->
+                        @if ($refGames->lastPage() > 1)
+                            <div class="mt-4 p-3 bg-[#0f1422] rounded-xl border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-3 font-code-metric text-xs">
+                                <div class="text-on-surface-variant flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                    <span>
+                                        Halaman <span class="text-primary font-bold">{{ $refGames->currentPage() }}</span> dari
+                                        <span class="text-white font-bold">{{ $refGames->lastPage() }}</span>
+                                        &bull; <span class="text-white font-bold">{{ number_format($refGames->total()) }}</span> game tersedia
+                                    </span>
+                                </div>
+                                <div class="landing-pagination">
+                                    {{ $refGames->links('partials.pagination-cyber') }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- LANGKAH 3: Tombol Simpan & Hitung Rekomendasi Game (HUD Action Bar) -->
@@ -788,723 +732,40 @@
                     </div>
                 </div>
 
-                {{-- ── 2. HASIL REKOMENDASI GAME (MUNCUL DI BAWAHNYA) ── --}}
-                <div id="hasil-rekomendasi" class="space-y-6 scroll-mt-24">
-                    <div
-                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-primary/20"
-                    >
+                {{-- ── 2. HASIL REKOMENDASI GAME (muncul setelah klik Hitung) ── --}}
+                <div id="hasil-rekomendasi" class="hidden mt-10 p-6 sm:p-8 bg-[#0f1422] border-2 border-secondary/30 rounded-2xl shadow-[0_0_35px_rgba(181,55,242,0.15)] relative tech-corner-accent space-y-6">
+                    <!-- Header Hasil Rekomendasi -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-secondary/20">
                         <div>
-                            <h3
-                                class="text-xl sm:text-2xl font-headline-md font-extrabold text-white flex items-center gap-2.5"
-                            >
-                                <span
-                                    class="w-8 h-8 rounded-lg bg-secondary/20 border border-secondary/60 flex items-center justify-center text-secondary shadow-[0_0_10px_rgba(181,55,242,0.4)]"
-                                >
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                                <span class="text-xs font-code-metric text-secondary uppercase font-bold tracking-widest">OUTPUT COSINE SIMILARITY</span>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-headline-md font-extrabold text-white flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-secondary/20 border border-secondary/60 flex items-center justify-center text-secondary shadow-[0_0_10px_rgba(181,55,242,0.4)]">
                                     <span class="material-symbols-outlined text-xl">auto_awesome</span>
                                 </span>
                                 <span>Rekomendasi Game Untukmu</span>
                             </h3>
-                            <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Hasil Content-Based Filtering &amp; Cosine Similarity terkalibrasi dari preferensi genre &amp; game favorit Anda.</p>
+                            <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Hasil kalkulasi cosine similarity berdasarkan genre &amp; game referensi yang Anda pilih.</p>
                         </div>
-
-                        <div class="flex items-center gap-2 text-xs font-code-metric">
-                            <span class="text-on-surface-variant">DIURUTKAN:</span>
-                            <span
-                                class="text-primary font-bold flex items-center gap-1 bg-primary/10 border border-primary/30 px-2.5 py-1 rounded"
-                            >
-                                <span class="material-symbols-outlined text-xs">tune</span>
-                                <span id="rec-status-badge">Kemiripan Tertinggi [S-TIER]</span>
-                            </span>
-                        </div>
+                        <span id="rec-status-badge" class="text-primary font-bold flex items-center gap-1 bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-code-metric">
+                            <span class="material-symbols-outlined text-xs">tune</span>
+                            <span>Kemiripan [S-TIER]</span>
+                        </span>
                     </div>
 
-                    <!-- Relative Container dengan Grid Kartu Game & Tactical Lock Overlay untuk Guest -->
-                    <div class="relative">
-                        <!-- Grid 8 Game Rekomendasi Terkalibrasi -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="recommended-games-grid">
-                            <!-- Card 1: Elden Ring -->
-                            <div
-                                data-rec-card
-                                data-genres="Soulslike, Souls-like, Dark Fantasy, RPG, Action"
-                                class="bg-[#0f1422] rounded-xl border border-primary/40 hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOnLaBUJanpII9wbcWasXlESOwboVv6hWa-BE-FPKqdbzLLLktqifw3ZFMx_lcG5PEZhzeILH2bdhFe__6MEwbfjy20co7xVJ2Bgevyy2N8IFBlpEtzCZSS0EZtQEcZBTaMxxNh-k1tbiuNx94c_cKjlXqERR0cYsfXnGOlS1Txiwt-BwIh8V7xeL_YhNKC_q64WAUzEvWYSmtQgvuCiKYRwUkaSpnD52k5Wm6ev3_VDZFfmHidt7P"
-                                        alt="Elden Ring"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        98% Cocok [S-TIER]
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Elden Ring
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.9</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">FromSoftware Inc.</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Souls-like</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Dark Fantasy</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >RPG</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.984</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 2: The Witcher 3 -->
-                            <div
-                                data-rec-card
-                                data-genres="RPG, Open World, Action"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwemg0Lreg0jbncfqAkBpEFV8lnBULopgIWVbQNRcb2a_7QyuknvpijBRM02q9tyDWUgBJo0FtFnhEXntq0NOVNefbRQHq5v7qbbMHpe-aKTOfwXJR5kNajVYaEuqvciAbdW1SP6wAwkkEf9uRadpV8HGboJ8QUCzsC_-3CfNol_q27BT7IWtbzEZlr9EFC3q2PR4DzW69H_QEqAHdQ91OOJ0ADxK5bY-lTDK8B3wfNbEKGqjVoQW3"
-                                        alt="The Witcher 3"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        96% Cocok [S-TIER]
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                The Witcher 3
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.9</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">CD PROJEKT RED</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >RPG</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Open World</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Action</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.962</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 3: Baldur's Gate 3 -->
-                            <div
-                                data-rec-card
-                                data-genres="RPG, CRPG, Choices Matter, Story Rich, Strategy, Turn-Based"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3vtl9hMwKCSMOUnF7nt0qUAUDsT3nysmgjswQOycScVqH0ea6F0dknMzb5rT14WlvQBOTZuWaSDXBGDnvD_Kncs0iT4Hes4GkdGyi-DD4q5BVqB5-2nD7c0eKzMgU_ta4v9fTNiT9STZwhxxcVnIMkwVn3O9QCPYcB3AYWTYDfdEBaw7QCZF1nR-Y4mOXbhC6539gZwzWtaqJDXHL_gez_EIUhfE2Gg9o9DzB-JL0f-QYWTmL_K3y"
-                                        alt="Baldurs Gate 3"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-secondary/50 text-secondary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(192,132,252,0.4)]"
-                                    >
-                                        94% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Baldur's Gate 3
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.9</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">Larian Studios</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >CRPG</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Story Rich</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Strategy</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-secondary/80"
-                                            >Vector Sim: 0.941</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 4: Hades -->
-                            <div
-                                data-rec-card
-                                data-genres="Action, Roguelike, Indie, Mythic"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYuW_xXnMEVfxrhqvi2OOoXgs9NchK--CYmarRzlUAEFVY2euOq4K94-KrhMJOUouur_6rCe6oH2j82vVTgEpwVHHPzkfAVMflWXz6Ox4_mHpmO4c1u2W7lJ9P9P9NKsOea3-1WQSDxA9TiyssU_pWgtz0SGZPkxpvsEGF-8T4mzMRyXsOIKdDy-SXpPNGXhPFbwn7UVI-QudR_qvVBAsHhQQPksTg_JBhfTxEMejwF66vhbcrRnqN"
-                                        alt="Hades"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        92% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Hades
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.8</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">Supergiant Games</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Roguelike</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Action</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Indie</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.923</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 5: Cyberpunk 2077 -->
-                            <div
-                                data-rec-card
-                                data-genres="RPG, Open World, Shooter, Action, Sci-Fi"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQjPavzwmRZx2cqfOCfH8v3nlw6Bx-Ea4jkzGG22O1Pa9BkPcK6IFN4cHuORgWSrpcUR7gGEgrb-RKSa0QLSy8MrRxl9-FWp2vBpyt4Ee3PwPyl-oa7ypP5Gfl5m7lz42Lrwk5bDRTzNlbZ3jRmeAmGQPAhw_KwHx38hpvW27WMR7CsajiOPFQbI-iVrZqXr_lhpbBBZ1sAKS3wnb-Ozz3A0kqwrzBuDsQLKm9VBfOrUt3bTy1-orh"
-                                        alt="Cyberpunk 2077"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        91% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Cyberpunk 2077
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.8</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">CD PROJEKT RED</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Open World</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >RPG</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Sci-Fi</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.915</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 6: Red Dead Redemption 2 -->
-                            <div
-                                data-rec-card
-                                data-genres="Open World, Story Rich, Action, Adventure"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt3kRWe3gqcgNUP7sHXAT6by2CXp7l8gsSWnHhCmjBFYrMKM9JCW570BZT7NoPCWp48iUX5nxmxFkLmstMLFn2WpRCEVLG7CwXSFlaHlyJu8B4amE4kJQgDeSRBkKRrlMKC9Y2-QgIo-LpvNKEcNFTps_qgustrhfblJU9yeLJNPkxsOhjx-4j9l-VHN5dBbTebg_LkKl0jcmZur1KmYpZD-hN8mKgVq92Dj-LELMoHrP23r6n0NNk"
-                                        alt="Red Dead Redemption 2"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        89% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Red Dead Redemption 2
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.9</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">Rockstar Games</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Open World</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Story Rich</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Action</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.895</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 7: Monster Hunter: World -->
-                            <div
-                                data-rec-card
-                                data-genres="Action, RPG, Co-op, Multiplayer"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNswDdYr0ZNIizGj1u97PwBl2PV6Ob7YCS_VLwigiL4yGKMinkOdgJ5NBgw65FlsZhkLZkjQpmQPPxhoXncKv71t-czNfazGde-f17rJRzdEwZGK8xOUtPO-0ColF9uD73CEPAk2SPQHh9qll2GHbhmB5xkmYcK-AsvgToYdIv9UEsFonL_g1o_EzjFBjv2KqJaHz6GqfYwvIG96IFkUGRy3k3M2BtLN5tsetLJv0Xo7nD8vDsgADk"
-                                        alt="Monster Hunter World"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        88% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                Monster Hunter: World
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.8</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">Capcom</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Action</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >RPG</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Co-op</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.882</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 8: God of War -->
-                            <div
-                                data-rec-card
-                                data-genres="Action, Mythology, Story Rich, Adventure"
-                                class="bg-[#0f1422] rounded-xl border border-[#1e293b] hover:border-primary overflow-hidden flex flex-col group transition-all duration-300 shadow-lg hover:glow-cyan hover:-translate-y-1"
-                            >
-                                <div class="relative aspect-[16/10] overflow-hidden">
-                                    <img
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtYx5wxB1xfQm6WhsyK72oYqA815YA3ekhXkSieWr4nzC7nuRcGsL8xCZUwDUkM5j5pLl4uOOVenR1FfekslRzGyb_eosSBz8lZHddEXlPTyBfVW0jj5swVuDSRrRTikElYp8m0-A8sPpQVbrBw3X50YWmPHyapYh5g9FQmIFn2m3oFh8HNBmDkZO3QXC7mFNMpAL1u6dapuZ3ZTCTiiOCfesyNo_d8B4J1nfIjKdlMUv1Z0LWp4M-"
-                                        alt="God of War"
-                                    />
-                                    <span
-                                        class="absolute top-3 right-3 px-2.5 py-1 rounded bg-[#080b11]/90 border border-primary/50 text-primary text-xs font-code-metric font-bold shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >
-                                        87% Cocok
-                                    </span>
-                                    <span
-                                        class="absolute top-3 left-3 px-2 py-0.5 rounded bg-surface-container-high/90 text-[10px] text-on-surface border border-[#1e293b] font-code-metric"
-                                    >
-                                        PC Steam
-                                    </span>
-                                </div>
-                                <div class="p-4 flex flex-col justify-between flex-grow">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h4
-                                                class="text-base font-headline-sm font-bold text-white group-hover:text-primary transition-colors"
-                                            >
-                                                God of War
-                                            </h4>
-                                            <div
-                                                class="flex items-center text-primary text-xs font-code-metric font-bold"
-                                            >
-                                                <span
-                                                    class="material-symbols-outlined text-sm text-primary"
-                                                    style="font-variation-settings: 'FILL' 1"
-                                                    >star</span
-                                                >
-                                                <span class="ml-1">4.9</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-code-metric text-on-surface-variant mb-3">Santa Monica Studio</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Action</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Mythology</span
-                                            >
-                                            <span
-                                                class="px-2 py-0.5 rounded bg-[#151c2d] border border-[#1e293b] text-[11px] font-code-metric text-on-surface"
-                                                >Story Rich</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between">
-                                        <span class="text-[11px] font-code-metric text-primary/80"
-                                            >Vector Sim: 0.874</span
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="
-                                                document.getElementById('modal-detail-game').classList.remove('hidden')
-                                            "
-                                            class="text-xs font-code-metric text-primary hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Detail</span>
-                                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Grid Hasil Rekomendasi (diisi oleh JS setelah klik Hitung) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="recommended-games-grid">
+                        <!-- Placeholder awal: akan diisi oleh simpanDanHitungRekomendasi() -->
+                        <div class="col-span-full py-20 text-center">
+                            <span class="material-symbols-outlined text-5xl text-secondary/30 mb-3">auto_awesome</span>
+                            <p class="text-white font-bold text-base">Rekomendasi Belum Dihitung</p>
+                            <p class="text-on-surface-variant text-xs font-code-metric mt-1">
+                                Atur preferensi genre &amp; pilih game favorit di atas, lalu klik
+                                <strong class="text-primary">Simpan &amp; Hitung Rekomendasi</strong>.
+                            </p>
                         </div>
-
-                        @guest
-                            <!-- Semi-Transparent Overlay Card Di Tengah (Tactical Lock Screen untuk Tamu) -->
-                            <div
-                                class="absolute inset-0 bg-[#080b11]/85 backdrop-blur-[8px] rounded-2xl flex items-center justify-center p-6 z-10 border border-primary/30"
-                            >
-                                <div
-                                    class="max-w-md w-full bg-[#0f1422] border-2 border-primary/50 rounded-2xl p-8 text-center shadow-[0_0_50px_rgba(0,240,255,0.25)] tech-corner-accent"
-                                >
-                                    <div
-                                        class="w-14 h-14 rounded-xl bg-primary/20 text-primary border border-primary/50 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,240,255,0.4)]"
-                                    >
-                                        <span class="material-symbols-outlined text-3xl">lock_open</span>
-                                    </div>
-                                    <h3
-                                        class="text-2xl font-headline-sm font-extrabold text-white uppercase tracking-wide mb-2"
-                                    >
-                                        Rekomendasi Personal Penuh
-                                    </h3>
-                                    <p class="text-body-md font-body-md text-on-surface-variant mb-6">Masuk untuk menyimpan preferensi genre, game favorit, dan mengkalkulasi rekomendasi AI personal tanpa batas.</p>
-                                    <div class="flex items-center justify-center gap-4">
-                                        <button
-                                            class="px-6 py-2.5 rounded border border-primary/50 text-primary hover:bg-primary/10 transition-all text-xs font-label-md uppercase tracking-wider font-bold"
-                                            onclick="toggleModal('modal-login')"
-                                        >
-                                            Masuk
-                                        </button>
-                                        <button
-                                            class="px-7 py-2.5 rounded btn-cyber-primary text-[#002022] hover:bg-primary transition-all text-xs font-label-md uppercase tracking-wider font-extrabold"
-                                            onclick="toggleModal('modal-register')"
-                                        >
-                                            Daftar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endguest
-
-                        @auth
-                            <!-- Logged-in: History & Stat Bar -->
-                            <div
-                                class="mt-6 p-4 bg-[#0f1422] border border-[#1e293b] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-10 h-10 rounded-lg bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary"
-                                    >
-                                        <span class="material-symbols-outlined text-xl">history</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-white text-sm font-bold">Riwayat Rekomendasi Terkalibrasi</p>
-                                        <p class="text-on-surface-variant text-xs font-code-metric">Tersimpan otomatis sesuai kalkulasi genre &amp; game favorit Anda</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onclick="toggleModal('modal-history')"
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded border border-tertiary/40 hover:border-tertiary text-tertiary hover:bg-tertiary/10 text-xs font-label-md uppercase tracking-wider font-bold transition-all shadow-[0_0_12px_rgba(0,255,163,0.15)]"
-                                    >
-                                        <span class="material-symbols-outlined text-sm">history</span>
-                                        Lihat Semua History
-                                    </button>
-                                    @if (auth()->user()->isAdmin())
-                                        <a
-                                            href="{{ route('dashboard.admin') }}"
-                                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded border border-secondary/40 hover:border-secondary text-secondary hover:bg-secondary/10 text-xs font-label-md uppercase tracking-wider font-bold transition-all"
-                                        >
-                                            <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
-                                            Kelola di Admin ML
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        @endauth
                     </div>
                 </div>
             </div>
@@ -1829,6 +1090,23 @@
 
                 // Filter & Re-rank rekomendasi kartu di bawahnya
                 applyRecommendations();
+
+                // Catat ke log history database
+                try {
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    fetch('{{ route("recommendations.save") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token || '',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            selected_genres: selectedGenres,
+                            reference_games: selectedRefGames
+                        })
+                    }).catch(function() {});
+                } catch (e) {}
 
                 // Smooth scroll ke bagian hasil rekomendasi
                 const hasilSection = document.getElementById('hasil-rekomendasi');
