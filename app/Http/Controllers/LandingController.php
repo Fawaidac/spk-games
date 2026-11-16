@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class LandingController extends Controller
 {
@@ -47,11 +48,34 @@ class LandingController extends Controller
                              ->withQueryString()
                              ->fragment('preferensi-section');
 
+        // Statistik dinamis untuk hero section
+        $totalGames = Game::count();
+        $totalDimensions = $this->getMatrixDimensions();
+
         return view('landing.index', compact(
             'genres',
             'refGames',
             'refSearch',
             'refGenre',
+            'totalGames',
+            'totalDimensions',
         ));
+    }
+
+    /**
+     * Baca dimensi fitur vektor dari file cache matriks recsys jika ada.
+     */
+    protected function getMatrixDimensions(): int
+    {
+        $cachePath = storage_path('app/recsys_matrix.json');
+        if (File::exists($cachePath)) {
+            try {
+                $data = json_decode(File::get($cachePath), true);
+                return (int) ($data['metadata']['total_dimensions'] ?? 516);
+            } catch (\Throwable) {
+                // fallback
+            }
+        }
+        return 516;
     }
 }

@@ -9,7 +9,7 @@
       <div class="flex flex-col">
         <div class="flex items-center gap-2">
           <span class="text-xl font-headline-sm font-extrabold text-white tracking-wider uppercase group-hover:text-primary transition-colors">Game<span class="text-primary">Match</span></span>
-          <span class="px-1.5 py-0.2 text-[9px] font-label-sm font-bold bg-primary/20 text-primary border border-primary/40 rounded tracking-widest">v2.4</span>
+          <span class="px-1.5 py-0.2 text-[9px] font-label-sm font-bold bg-primary/20 text-primary border border-primary/40 rounded tracking-widest">v1.0</span>
         </div>
         <span class="text-[10px] uppercase tracking-widest text-[#94a3b8] font-code-metric flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>

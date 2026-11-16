@@ -92,7 +92,7 @@
         </div>
         <div class="mt-3 flex items-baseline gap-2">
           <span class="font-headline font-bold text-2xl text-white tracking-tight">ACTIVE LOG</span>
-          <span class="font-mono text-xs text-primary font-semibold">v2.4</span>
+          <span class="font-mono text-xs text-primary font-semibold">v1.0</span>
         </div>
         <div class="mt-2 text-[11px] font-mono text-on-surface-variant flex items-center gap-1">
           <span class="text-primary font-bold">TF-IDF Vector</span>

@@ -245,26 +245,16 @@
                     <!-- Telemetry Micro-Stat HUD Grid -->
                     <div class="pt-6 grid grid-cols-3 gap-4 border-t border-[#1e293b] max-w-lg">
                         <div class="p-2.5 rounded bg-surface-container/50 border border-[#1e293b]">
-                            <p class="text-2xl font-headline-md font-extrabold text-white">50.000+</p>
-                            <p
-                                class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5"
-                            >Katalog Steam</p>
+                            <p class="text-2xl font-headline-md font-extrabold text-white">{{ number_format($totalGames) }}+</p>
+                            <p class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5">Katalog Steam</p>
                         </div>
                         <div class="p-2.5 rounded bg-surface-container/50 border border-[#1e293b]">
-                            <p
-                                class="text-2xl font-headline-md font-extrabold text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]"
-                            >&lt; 0.08s</p>
-                            <p
-                                class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5"
-                            >Waktu Kalkulasi</p>
+                            <p class="text-2xl font-headline-md font-extrabold text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]">&lt; 1s</p>
+                            <p class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5">Waktu Kalkulasi</p>
                         </div>
                         <div class="p-2.5 rounded bg-surface-container/50 border border-[#1e293b]">
-                            <p
-                                class="text-2xl font-headline-md font-extrabold text-tertiary drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                            >98.2%</p>
-                            <p
-                                class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5"
-                            >Akurasi Kemiripan</p>
+                            <p class="text-2xl font-headline-md font-extrabold text-tertiary drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">{{ $totalDimensions }}D</p>
+                            <p class="text-xs font-code-metric text-on-surface-variant uppercase tracking-wider mt-0.5">Dimensi Fitur</p>
                         </div>
                     </div>
                 </div>
@@ -418,7 +408,7 @@
                         @auth
                             <button
                                 type="button"
-                                onclick="toggleModal('modal-history')"
+                                onclick="openHistoryModal()"
                                 class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-tertiary/40 hover:border-tertiary text-tertiary hover:bg-tertiary/10 text-xs font-code-metric uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(0,255,163,0.15)]"
                             >
                                 <span class="material-symbols-outlined text-sm">history</span>
@@ -480,7 +470,7 @@
                         <div class="flex items-center gap-2">
                             <button
                                 type="button"
-                                onclick="toggleModal('modal-history')"
+                                onclick="openHistoryModal()"
                                 class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-tertiary/40 hover:border-tertiary text-tertiary hover:bg-tertiary/10 text-xs font-code-metric uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(0,255,163,0.15)]"
                             >
                                 <span class="material-symbols-outlined text-sm">history</span>
@@ -607,7 +597,8 @@
                                     $gameGenresStr = $game->genres->pluck('name')->implode(', ');
                                 @endphp
                                 <div
-                                    onclick="toggleReferenceGame(this, '{{ addslashes($game->title) }}')"
+                                    onclick="toggleReferenceGame(this, {{ $game->id }}, '{{ addslashes($game->title) }}', '{{ addslashes($game->image_url ?? '') }}')"
+                                    data-ref-id="{{ $game->id }}"
                                     data-ref-title="{{ strtolower($game->title) }}"
                                     data-ref-genres="{{ strtolower($gameGenresStr) }}"
                                     class="ref-game-card relative rounded-xl border p-2.5 bg-[#080b11] hover:border-primary/80 transition-all duration-200 cursor-pointer group flex flex-col justify-between select-none border-[#1e293b]"
@@ -732,39 +723,68 @@
                     </div>
                 </div>
 
-                {{-- ── 2. HASIL REKOMENDASI GAME (muncul setelah klik Hitung) ── --}}
-                <div id="hasil-rekomendasi" class="hidden mt-10 p-6 sm:p-8 bg-[#0f1422] border-2 border-secondary/30 rounded-2xl shadow-[0_0_35px_rgba(181,55,242,0.15)] relative tech-corner-accent space-y-6">
-                    <!-- Header Hasil Rekomendasi -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-secondary/20">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                                <span class="text-xs font-code-metric text-secondary uppercase font-bold tracking-widest">OUTPUT COSINE SIMILARITY</span>
+                {{-- ── 2. HASIL REKOMENDASI GAME ── --}}
+                <div id="hasil-rekomendasi" class="hidden mt-10 space-y-6">
+                    {{-- Header --}}
+                    <div class="p-5 sm:p-6 bg-[#0f1422] border-2 border-secondary/30 rounded-2xl shadow-[0_0_35px_rgba(181,55,242,0.15)] relative tech-corner-accent">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-secondary/20">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                                    <span class="text-xs font-code-metric text-secondary uppercase font-bold tracking-widest">HASIL REKOMENDASI UNTUKMU</span>
+                                </div>
+                                <p class="text-on-surface-variant font-code-metric text-xs mt-0.5" id="rec-summary-line">— game &bull; rata-rata kecocokan —</p>
                             </div>
-                            <h3 class="text-xl sm:text-2xl font-headline-md font-extrabold text-white flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-secondary/20 border border-secondary/60 flex items-center justify-center text-secondary shadow-[0_0_10px_rgba(181,55,242,0.4)]">
-                                    <span class="material-symbols-outlined text-xl">auto_awesome</span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                {{-- Top N selector --}}
+                                <select id="select-top-n" onchange="rerunWithNewN()"
+                                    class="bg-[#0f1422] border border-secondary/40 text-secondary font-mono text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-secondary">
+                                    <option value="5">Top 5</option>
+                                    <option value="10" selected>Top 10</option>
+                                    <option value="20">Top 20</option>
+                                </select>
+                                {{-- Sort --}}
+                                <select id="select-sort" onchange="applySortFilter()"
+                                    class="bg-[#0f1422] border border-secondary/40 text-secondary font-mono text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-secondary">
+                                    <option value="similarity">Urutkan: Kecocokan</option>
+                                    <option value="rating">Urutkan: Rating</option>
+                                </select>
+                                {{-- Genre filter --}}
+                                <select id="select-genre-filter" onchange="applySortFilter()"
+                                    class="bg-[#0f1422] border border-secondary/40 text-secondary font-mono text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-secondary">
+                                    <option value="">Semua Genre</option>
+                                </select>
+                                <span id="rec-time-badge" class="text-xs font-code-metric text-primary/80 bg-primary/10 border border-primary/20 px-2 py-1 rounded hidden">
+                                    <span class="material-symbols-outlined text-xs">timer</span>
+                                    <span id="rec-time-ms">0</span>ms
                                 </span>
-                                <span>Rekomendasi Game Untukmu</span>
-                            </h3>
-                            <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Hasil kalkulasi cosine similarity berdasarkan genre &amp; game referensi yang Anda pilih.</p>
+                            </div>
                         </div>
-                        <span id="rec-status-badge" class="text-primary font-bold flex items-center gap-1 bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-code-metric">
-                            <span class="material-symbols-outlined text-xs">tune</span>
-                            <span>Kemiripan [S-TIER]</span>
-                        </span>
-                    </div>
 
-                    <!-- Grid Hasil Rekomendasi (diisi oleh JS setelah klik Hitung) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="recommended-games-grid">
-                        <!-- Placeholder awal: akan diisi oleh simpanDanHitungRekomendasi() -->
-                        <div class="col-span-full py-20 text-center">
-                            <span class="material-symbols-outlined text-5xl text-secondary/30 mb-3">auto_awesome</span>
-                            <p class="text-white font-bold text-base">Rekomendasi Belum Dihitung</p>
-                            <p class="text-on-surface-variant text-xs font-code-metric mt-1">
-                                Atur preferensi genre &amp; pilih game favorit di atas, lalu klik
-                                <strong class="text-primary">Simpan &amp; Hitung Rekomendasi</strong>.
-                            </p>
+                        {{-- State: loading --}}
+                        <div id="rec-state-loading" class="hidden py-16 text-center">
+                            <span class="material-symbols-outlined text-5xl text-secondary/40 animate-spin">sync</span>
+                            <p class="text-white font-bold mt-3">Menghitung Cosine Similarity...</p>
+                            <p class="text-on-surface-variant text-xs font-code-metric mt-1">Memproses {{ number_format($totalGames) }} vektor game...</p>
+                        </div>
+
+                        {{-- State: empty (belum pilih game) --}}
+                        <div id="rec-state-empty" class="py-16 text-center">
+                            <span class="material-symbols-outlined text-5xl text-secondary/30 mb-3">recommend</span>
+                            <p class="text-white font-bold text-base">Belum ada game favorit dipilih</p>
+                            <p class="text-on-surface-variant text-xs font-code-metric mt-1">Pilih minimal 1 game favorit di panel di atas, lalu klik <strong class="text-primary">Hitung Rekomendasi</strong>.</p>
+                        </div>
+
+                        {{-- State: error --}}
+                        <div id="rec-state-error" class="hidden py-10 text-center">
+                            <span class="material-symbols-outlined text-4xl text-red-400/60 mb-2">error</span>
+                            <p class="text-red-400 font-bold" id="rec-error-msg">Terjadi kesalahan.</p>
+                            <button onclick="retryCalculation()" class="mt-3 px-4 py-1.5 rounded border border-primary/40 text-primary font-mono text-xs hover:bg-primary/10 transition-colors">Coba Lagi</button>
+                        </div>
+
+                        {{-- Grid Kartu Game --}}
+                        <div id="recommended-games-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+                            {{-- Diisi oleh JS --}}
                         </div>
                     </div>
                 </div>
@@ -809,7 +829,7 @@
                                 >
                                     Dataset Kaggle (Steam PC Games)
                                 </h4>
-                                <p class="text-body-sm font-body-sm text-on-surface-variant">Data game bersumber dari dataset Kaggle (Steam PC Games) terverifikasi dengan pembersihan data kontinu mencakup 50.000+ entri katalog aktif, tag komunitas, dan rating ulasan positif.</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Data game bersumber dari dataset Kaggle (Steam PC Games) terverifikasi dengan pembersihan data kontinu mencakup {{ number_format($totalGames) }}+ entri katalog aktif, tag komunitas, dan rating ulasan positif.</p>
                             </div>
                         </div>
                     </div>
@@ -874,7 +894,7 @@
                                     >Total Judul</span
                                 >
                                 <span class="text-2xl font-headline-md font-extrabold text-white mt-1 block"
-                                    >52.840</span
+                                    >{{ number_format($totalGames) }}</span
                                 >
                                 <span class="text-[10px] font-code-metric text-tertiary">Terindeks Penuh</span>
                             </div>
@@ -886,7 +906,7 @@
                                 >
                                 <span
                                     class="text-2xl font-headline-md font-extrabold text-secondary mt-1 block drop-shadow-[0_0_8px_rgba(192,132,252,0.4)]"
-                                    >348</span
+                                    >{{ $totalDimensions }}</span
                                 >
                                 <span class="text-[10px] font-code-metric text-on-surface-variant"
                                     >Fitur Tag TF-IDF</span
@@ -919,254 +939,362 @@
 @endsection
 
 @section ('scripts')
-    <script>
-        // State Preferensi Cold-Start
-        let selectedGenres = ['Action', 'RPG', 'Open World', 'Souls-like'];
-        let selectedRefGames = ['Cyberpunk 2077', 'Elden Ring', "Baldur's Gate 3"];
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// GameMatch RecSys — Landing Page JavaScript
+// ═══════════════════════════════════════════════════════════════════
 
-        // Toggle Genre Chip
-        function toggleGenreChip(button) {
-            const genre = button.getAttribute('data-genre');
-            const checkIcon = button.querySelector('.chip-check');
+// --- STATE ---
+let selectedGenres = ['Action', 'RPG', 'Strategy', 'Adventure'];
+let selectedRefGameIds = {};   // { id: { id, title } }
+let lastCalculationResult = null;
+let isCalculating = false;
 
-            if (selectedGenres.includes(genre)) {
-                selectedGenres = selectedGenres.filter((g) => g !== genre);
-                button.classList.remove(
-                    'bg-primary',
-                    'text-[#002022]',
-                    'font-bold',
-                    'border-primary',
-                    'shadow-[0_0_12px_rgba(0,240,255,0.4)]',
-                );
-                button.classList.add('border-[#1e293b]', 'text-on-surface-variant', 'bg-surface-container/60');
-                if (checkIcon) checkIcon.classList.add('hidden');
-            } else {
-                selectedGenres.push(genre);
-                button.classList.add(
-                    'bg-primary',
-                    'text-[#002022]',
-                    'font-bold',
-                    'border-primary',
-                    'shadow-[0_0_12px_rgba(0,240,255,0.4)]',
-                );
-                button.classList.remove('border-[#1e293b]', 'text-on-surface-variant', 'bg-surface-container/60');
-                if (checkIcon) checkIcon.classList.remove('hidden');
-            }
+// ─── GENRE CHIPS ──────────────────────────────────────────────────
+function toggleGenreChip(button) {
+    const genre = button.getAttribute('data-genre');
+    const checkIcon = button.querySelector('.chip-check');
+    if (selectedGenres.includes(genre)) {
+        selectedGenres = selectedGenres.filter(g => g !== genre);
+        button.classList.remove('bg-primary','text-[#002022]','font-bold','border-primary','shadow-[0_0_12px_rgba(0,240,255,0.4)]');
+        button.classList.add('border-[#1e293b]','text-on-surface-variant','bg-surface-container/60');
+        if (checkIcon) checkIcon.classList.add('hidden');
+    } else {
+        selectedGenres.push(genre);
+        button.classList.add('bg-primary','text-[#002022]','font-bold','border-primary','shadow-[0_0_12px_rgba(0,240,255,0.4)]');
+        button.classList.remove('border-[#1e293b]','text-on-surface-variant','bg-surface-container/60');
+        if (checkIcon) checkIcon.classList.remove('hidden');
+    }
+    updateTelemetry();
+}
 
-            updateTelemetry();
+function selectAllGenres() {
+    document.querySelectorAll('.genre-chip[data-genre]').forEach(button => {
+        const genre = button.getAttribute('data-genre');
+        if (!selectedGenres.includes(genre)) selectedGenres.push(genre);
+        button.classList.add('bg-primary','text-[#002022]','font-bold','border-primary','shadow-[0_0_12px_rgba(0,240,255,0.4)]');
+        button.classList.remove('border-[#1e293b]','text-on-surface-variant','bg-surface-container/60');
+        const ci = button.querySelector('.chip-check');
+        if (ci) ci.classList.remove('hidden');
+    });
+    updateTelemetry();
+}
+
+function resetGenreFilter() {
+    selectedGenres = [];
+    document.querySelectorAll('.genre-chip[data-genre]').forEach(button => {
+        button.classList.remove('bg-primary','text-[#002022]','font-bold','border-primary','shadow-[0_0_12px_rgba(0,240,255,0.4)]');
+        button.classList.add('border-[#1e293b]','text-on-surface-variant','bg-surface-container/60');
+        const ci = button.querySelector('.chip-check');
+        if (ci) ci.classList.add('hidden');
+    });
+    updateTelemetry();
+}
+
+// ─── GAME FAVORIT CARDS ───────────────────────────────────────────
+function toggleReferenceGame(card, gameId, title, imageUrl) {
+    const checkIndicator = card.querySelector('.check-indicator');
+    if (selectedRefGameIds[gameId]) {
+        delete selectedRefGameIds[gameId];
+        card.classList.remove('border-primary','ring-1','ring-primary/80','bg-primary/5','shadow-[0_0_15px_rgba(0,240,255,0.25)]');
+        card.classList.add('border-[#1e293b]');
+        if (checkIndicator) {
+            checkIndicator.classList.remove('bg-primary','text-[#002022]','shadow-[0_0_8px_rgba(0,240,255,0.8)]');
+            checkIndicator.classList.add('bg-black/60','text-white/40','border','border-white/20');
         }
-
-        // Pilih Semua Genre
-        function selectAllGenres() {
-            document.querySelectorAll('.genre-chip[data-genre]').forEach((button) => {
-                const genre = button.getAttribute('data-genre');
-                if (!selectedGenres.includes(genre)) {
-                    selectedGenres.push(genre);
-                }
-                button.classList.add(
-                    'bg-primary',
-                    'text-[#002022]',
-                    'font-bold',
-                    'border-primary',
-                    'shadow-[0_0_12px_rgba(0,240,255,0.4)]',
-                );
-                button.classList.remove('border-[#1e293b]', 'text-on-surface-variant', 'bg-surface-container/60');
-                const checkIcon = button.querySelector('.chip-check');
-                if (checkIcon) checkIcon.classList.remove('hidden');
-            });
-            updateTelemetry();
+    } else {
+        selectedRefGameIds[gameId] = { id: gameId, title, imageUrl };
+        card.classList.add('border-primary','ring-1','ring-primary/80','bg-primary/5','shadow-[0_0_15px_rgba(0,240,255,0.25)]');
+        card.classList.remove('border-[#1e293b]');
+        if (checkIndicator) {
+            checkIndicator.classList.add('bg-primary','text-[#002022]','shadow-[0_0_8px_rgba(0,240,255,0.8)]');
+            checkIndicator.classList.remove('bg-black/60','text-white/40','border','border-white/20');
         }
+    }
+    updateTelemetry();
+}
 
-        // Reset Genre Filter
-        function resetGenreFilter() {
-            selectedGenres = [];
-            document.querySelectorAll('.genre-chip[data-genre]').forEach((button) => {
-                button.classList.remove(
-                    'bg-primary',
-                    'text-[#002022]',
-                    'font-bold',
-                    'border-primary',
-                    'shadow-[0_0_12px_rgba(0,240,255,0.4)]',
-                );
-                button.classList.add('border-[#1e293b]', 'text-on-surface-variant', 'bg-surface-container/60');
-                const checkIcon = button.querySelector('.chip-check');
-                if (checkIcon) checkIcon.classList.add('hidden');
-            });
-            updateTelemetry();
-        }
+function filterReferenceGames(query) {
+    const q = (query || '').toLowerCase().trim();
+    document.querySelectorAll('.ref-game-card').forEach(card => {
+        const title = card.getAttribute('data-ref-title') || '';
+        const genres = card.getAttribute('data-ref-genres') || '';
+        card.style.display = (!q || title.includes(q) || genres.includes(q)) ? '' : 'none';
+    });
+}
 
-        // Toggle Reference Game Selection
-        function toggleReferenceGame(card, title) {
-            const checkIndicator = card.querySelector('.check-indicator');
+// ─── TELEMETRY ────────────────────────────────────────────────────
+function updateTelemetry() {
+    const favCount = Object.keys(selectedRefGameIds).length;
+    const el = document.getElementById('cfg-detail-summary');
+    const badge = document.getElementById('fav-games-count-badge');
+    if (el) el.textContent = `${selectedGenres.length} Genre Aktif • ${favCount} Game Favorit Terpilih`;
+    if (badge) badge.textContent = `${favCount} Game Terpilih`;
+}
 
-            if (selectedRefGames.includes(title)) {
-                selectedRefGames = selectedRefGames.filter((t) => t !== title);
-                card.classList.remove(
-                    'border-primary',
-                    'ring-1',
-                    'ring-primary/80',
-                    'bg-primary/5',
-                    'shadow-[0_0_15px_rgba(0,240,255,0.25)]',
-                );
-                card.classList.add('border-[#1e293b]');
-                if (checkIndicator) {
-                    checkIndicator.classList.remove(
-                        'bg-primary',
-                        'text-[#002022]',
-                        'shadow-[0_0_8px_rgba(0,240,255,0.8)]',
-                    );
-                    checkIndicator.classList.add('bg-black/60', 'text-white/40', 'border', 'border-white/20');
-                }
-            } else {
-                selectedRefGames.push(title);
-                card.classList.add(
-                    'border-primary',
-                    'ring-1',
-                    'ring-primary/80',
-                    'bg-primary/5',
-                    'shadow-[0_0_15px_rgba(0,240,255,0.25)]',
-                );
-                card.classList.remove('border-[#1e293b]');
-                if (checkIndicator) {
-                    checkIndicator.classList.add(
-                        'bg-primary',
-                        'text-[#002022]',
-                        'shadow-[0_0_8px_rgba(0,240,255,0.8)]',
-                    );
-                    checkIndicator.classList.remove('bg-black/60', 'text-white/40', 'border', 'border-white/20');
-                }
-            }
+// ─── MAIN: HITUNG REKOMENDASI (AJAX) ─────────────────────────────
+async function simpanDanHitungRekomendasi() {
+    if (isCalculating) return;
+    const favIds = Object.keys(selectedRefGameIds).map(Number);
+    if (favIds.length === 0) {
+        showHasilPanel();
+        setRecState('empty');
+        document.getElementById('hasil-rekomendasi')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
 
-            updateTelemetry();
-        }
+    const topN = parseInt(document.getElementById('select-top-n')?.value || '10');
+    const btn = document.getElementById('btn-hitung-rekomendasi');
+    const btnText = document.getElementById('btn-calc-text');
+    const btnIcon = document.getElementById('btn-calc-icon');
+    const hud = document.getElementById('calc-progress-hud');
 
-        // Filter Search Reference Games Live
-        function filterReferenceGames(query) {
-            const q = (query || '').toLowerCase().trim();
-            const cards = document.querySelectorAll('.ref-game-card');
+    isCalculating = true;
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.textContent = 'Menghitung...';
+    if (btnIcon) btnIcon.classList.add('animate-spin');
+    if (hud) hud.classList.remove('hidden');
 
-            cards.forEach((card) => {
-                const title = card.getAttribute('data-ref-title') || '';
-                const genres = card.getAttribute('data-ref-genres') || '';
-                if (!q || title.includes(q) || genres.includes(q)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+    showHasilPanel();
+    setRecState('loading');
 
-        // Update Telemetry Indicators
-        function updateTelemetry() {
-            const detailSummary = document.getElementById('cfg-detail-summary');
-            const favCountBadge = document.getElementById('fav-games-count-badge');
-
-            if (detailSummary) {
-                detailSummary.textContent = `${selectedGenres.length} Genre Aktif • ${selectedRefGames.length} Game Favorit Terpilih`;
-            }
-            if (favCountBadge) {
-                favCountBadge.textContent = `${selectedRefGames.length} Game Terpilih`;
-            }
-        }
-
-        // Simpan & Hitung Rekomendasi Game (Cosine Similarity Algorithm Flow)
-        function simpanDanHitungRekomendasi() {
-            const btn = document.getElementById('btn-hitung-rekomendasi');
-            const btnText = document.getElementById('btn-calc-text');
-            const btnIcon = document.getElementById('btn-calc-icon');
-            const hud = document.getElementById('calc-progress-hud');
-
-            if (btn) btn.disabled = true;
-            if (btnText) btnText.textContent = 'Mengkalkulasi Vektor...';
-            if (btnIcon) btnIcon.classList.add('animate-spin');
-            if (hud) hud.classList.remove('hidden');
-
-            setTimeout(() => {
-                // Selesai kalkulasi: sembunyikan HUD progress
-                if (hud) hud.classList.add('hidden');
-                if (btn) btn.disabled = false;
-                if (btnText) btnText.textContent = 'Simpan & Hitung Rekomendasi';
-                if (btnIcon) btnIcon.classList.remove('animate-spin');
-
-                // Filter & Re-rank rekomendasi kartu di bawahnya
-                applyRecommendations();
-
-                // Catat ke log history database
-                try {
-                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                    fetch('{{ route("recommendations.save") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token || '',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            selected_genres: selectedGenres,
-                            reference_games: selectedRefGames
-                        })
-                    }).catch(function() {});
-                } catch (e) {}
-
-                // Smooth scroll ke bagian hasil rekomendasi
-                const hasilSection = document.getElementById('hasil-rekomendasi');
-                if (hasilSection) {
-                    hasilSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-
-                // Tampilkan toast
-                if (window.GameMatchFlow && window.GameMatchFlow.showToast) {
-                    window.GameMatchFlow.showToast(
-                        'REKOMENDASI TERKALIBRASI',
-                        'Preferensi disimpan! Menampilkan game dengan skor kemiripan tertinggi.',
-                        'cyan',
-                        3000,
-                    );
-                }
-            }, 450);
-        }
-
-        // Terapkan hasil rekomendasi pada kartu di bawah
-        function applyRecommendations() {
-            const recCards = document.querySelectorAll('[data-rec-card]');
-            const statusBadge = document.getElementById('rec-status-badge');
-
-            let visibleCount = 0;
-            recCards.forEach((card, idx) => {
-                const cardGenres = (card.getAttribute('data-genres') || '')
-                    .split(',')
-                    .map((s) => s.trim().toLowerCase());
-
-                if (selectedGenres.length === 0) {
-                    card.style.display = '';
-                    card.style.opacity = '1';
-                    visibleCount++;
-                } else {
-                    const matches = selectedGenres.some((g) => cardGenres.includes(g.toLowerCase()));
-                    if (matches) {
-                        card.style.display = '';
-                        card.style.opacity = '1';
-                        visibleCount++;
-                    } else {
-                        // Tetap tampilkan tapi dengan opacity lebih rendah jika di luar fokus utama
-                        if (visibleCount < 4) {
-                            card.style.display = '';
-                            card.style.opacity = '0.4';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                }
-            });
-
-            if (statusBadge) {
-                statusBadge.textContent = `Terkalibrasi (${selectedGenres.length} Genre, ${selectedRefGames.length} Game Ref)`;
-            }
-        }
-
-        // Inisialisasi saat halaman selesai dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            updateTelemetry();
+    try {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const response = await fetch('{{ route("recommendations.calculate") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+            body: JSON.stringify({ game_ids: favIds, genres: selectedGenres, top_n: topN })
         });
-    </script>
+        const data = await response.json();
+        if (!response.ok || data.status === 'error') {
+            throw new Error(data.message || (data.errors && Object.values(data.errors)[0]?.[0]) || 'Kalkulasi gagal.');
+        }
+        lastCalculationResult = data;
+        renderRecommendations(data);
+        populateGenreFilterDropdown(data.recommendations);
+        setTimeout(() => document.getElementById('hasil-rekomendasi')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        window.GameMatchFlow?.showToast?.('REKOMENDASI SELESAI', `${data.recommendations.length} game cocok dalam ${data.execution_time_ms}ms.`, 'cyan', 4000);
+    } catch (err) {
+        setRecState('error', err.message);
+    } finally {
+        isCalculating = false;
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = 'Hitung Rekomendasi';
+        if (btnIcon) btnIcon.classList.remove('animate-spin');
+        if (hud) hud.classList.add('hidden');
+    }
+}
+
+function retryCalculation() { simpanDanHitungRekomendasi(); }
+function rerunWithNewN() { if (lastCalculationResult) simpanDanHitungRekomendasi(); }
+
+function showHasilPanel() {
+    const panel = document.getElementById('hasil-rekomendasi');
+    if (panel) panel.classList.remove('hidden');
+}
+
+function setRecState(state, errorMsg) {
+    document.getElementById('rec-state-loading')?.classList.toggle('hidden', state !== 'loading');
+    document.getElementById('rec-state-empty')?.classList.toggle('hidden', state !== 'empty');
+    document.getElementById('rec-state-error')?.classList.toggle('hidden', state !== 'error');
+    document.getElementById('recommended-games-grid')?.classList.toggle('hidden', state !== 'results');
+    if (state === 'error' && errorMsg) {
+        const el = document.getElementById('rec-error-msg');
+        if (el) el.textContent = errorMsg;
+    }
+}
+
+// ─── RENDER KARTU GAME ────────────────────────────────────────────
+function renderRecommendations(data) {
+    const grid = document.getElementById('recommended-games-grid');
+    const summary = document.getElementById('rec-summary-line');
+    const timeBadge = document.getElementById('rec-time-badge');
+    const timeMs = document.getElementById('rec-time-ms');
+
+    if (summary) summary.textContent = `${data.recommendations.length} game \u2022 rata-rata kecocokan ${(data.avg_similarity * 100).toFixed(2)}%`;
+    if (timeBadge) timeBadge.classList.remove('hidden');
+    if (timeMs) timeMs.textContent = data.execution_time_ms;
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (data.recommendations.length === 0) { setRecState('empty'); return; }
+
+    data.recommendations.forEach((rec, idx) => {
+        const pct = parseFloat(rec.percentage).toFixed(2);
+        const matchedStr = rec.matched_genres.length > 0 ? rec.matched_genres.join(', ') : '\u2014';
+        const genreTagsHtml = rec.genres.slice(0, 3).map(g =>
+            `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-secondary/15 text-secondary border border-secondary/30">${esc(g)}</span>`
+        ).join('');
+        const badgeColor = pct >= 70 ? 'text-primary border-primary/40 bg-primary/10'
+                         : pct >= 40 ? 'text-secondary border-secondary/40 bg-secondary/10'
+                                     : 'text-tertiary border-tertiary/40 bg-tertiary/10';
+        const topFeatures = (rec.calculation_details?.top_features || []).slice(0, 5);
+        const featHtml = topFeatures.map(f =>
+            `<div class="flex justify-between gap-2 text-[10px] font-mono py-0.5 border-b border-outline-variant/30">
+                <span class="text-on-surface-variant truncate" title="${esc(f.feature)}">${esc(f.feature)}</span>
+                <span class="text-primary font-bold shrink-0">${parseFloat(f.contribution).toFixed(4)}</span>
+            </div>`
+        ).join('');
+        const detailId = `calc-detail-${idx}`;
+        const imgSrc = rec.image_url || `https://placehold.co/320x180/0f1422/00f0ff?text=${encodeURIComponent(rec.title)}`;
+
+        const card = document.createElement('div');
+        card.className = 'relative bg-[#080b11] rounded-xl border border-[#1e293b] hover:border-secondary/60 transition-all duration-200 group overflow-hidden flex flex-col';
+        card.setAttribute('data-rec-card','');
+        card.setAttribute('data-genres', rec.genres.join(','));
+        card.setAttribute('data-similarity', rec.similarity);
+        card.setAttribute('data-rating', rec.rating);
+        card.innerHTML = `
+            <div class="relative aspect-[16/9] overflow-hidden bg-black/60">
+                <img src="${esc(imgSrc)}" alt="${esc(rec.title)}" loading="lazy"
+                    onerror="this.onerror=null;this.src='https://placehold.co/320x180/0f1422/00f0ff?text=Steam';"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-primary/20 text-primary border border-primary/40">PC</span>
+                <span class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${badgeColor}">${pct}%</span>
+            </div>
+            <div class="p-3 flex flex-col gap-2 flex-1">
+                <div>
+                    <h4 class="text-xs font-bold text-white truncate group-hover:text-secondary transition-colors" title="${esc(rec.title)}">${esc(rec.title)}</h4>
+                    <p class="text-[10px] font-code-metric text-on-surface-variant truncate">${esc(rec.developers || 'Steam Publisher')}</p>
+                </div>
+                <div class="flex flex-wrap gap-1">${genreTagsHtml}</div>
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-amber-400 text-[13px]">star</span>
+                    <span class="text-white font-bold text-xs">${parseFloat(rec.rating).toFixed(1)}</span>
+                    <span class="text-on-surface-variant text-[9px]">/ 5.0</span>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[10px] font-mono mb-0.5">
+                        <span class="text-on-surface-variant">Kecocokan</span>
+                        <span class="text-secondary font-bold">${pct}%</span>
+                    </div>
+                    <div class="w-full h-1.5 rounded-full bg-surface-container-low overflow-hidden border border-outline-variant/40">
+                        <div class="h-full bg-gradient-to-r from-secondary to-primary rounded-full" style="width:${Math.min(100,parseFloat(pct))}%"></div>
+                    </div>
+                </div>
+                <p class="text-[10px] font-code-metric text-on-surface-variant"><span class="text-primary font-bold">Genre sama:</span> ${esc(matchedStr)}</p>
+                <button onclick="toggleCalcDetail('${detailId}')"
+                    class="mt-auto w-full py-1.5 rounded border border-secondary/30 text-secondary hover:bg-secondary/10 font-mono text-[10px] uppercase tracking-wider transition-colors flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-xs">functions</span>
+                    Lihat Detail Perhitungan
+                </button>
+            </div>
+            <div id="${detailId}" class="hidden border-t border-outline-variant/50 p-3 bg-black/60 text-[10px] font-mono space-y-2">
+                <p class="text-secondary font-bold uppercase tracking-wider text-[11px] mb-1">Detail Kalkulasi Cosine Similarity</p>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <div class="bg-surface-container/60 p-2 rounded border border-outline-variant/40"><p class="text-on-surface-variant uppercase text-[9px]">Dot Product</p><p class="text-primary font-bold">${parseFloat(rec.calculation_details?.dot_product||0).toFixed(4)}</p></div>
+                    <div class="bg-surface-container/60 p-2 rounded border border-outline-variant/40"><p class="text-on-surface-variant uppercase text-[9px]">Cosine Sim</p><p class="text-secondary font-bold">${parseFloat(rec.calculation_details?.cosine_similarity||0).toFixed(4)}</p></div>
+                    <div class="bg-surface-container/60 p-2 rounded border border-outline-variant/40"><p class="text-on-surface-variant uppercase text-[9px]">||A|| (Profil)</p><p class="text-tertiary font-bold">${parseFloat(rec.calculation_details?.norm_profile||0).toFixed(4)}</p></div>
+                    <div class="bg-surface-container/60 p-2 rounded border border-outline-variant/40"><p class="text-on-surface-variant uppercase text-[9px]">||B|| (Game)</p><p class="text-amber-400 font-bold">${parseFloat(rec.calculation_details?.norm_game||0).toFixed(4)}</p></div>
+                </div>
+                <p class="text-on-surface-variant uppercase text-[9px] font-bold mt-1">5 Fitur Kontribusi Terbesar:</p>
+                <div>${featHtml}</div>
+                <p class="text-on-surface-variant/50 text-[9px] mt-1">cosine(A,B) = \u03a3(Ai\u00b7Bi) / (||A|| \u00d7 ||B||)</p>
+            </div>`;
+        grid.appendChild(card);
+    });
+    setRecState('results');
+}
+
+function toggleCalcDetail(id) {
+    document.getElementById(id)?.classList.toggle('hidden');
+}
+
+// ─── FILTER / SORT ────────────────────────────────────────────────
+function populateGenreFilterDropdown(recs) {
+    const sel = document.getElementById('select-genre-filter');
+    if (!sel) return;
+    const genreSet = new Set();
+    recs.forEach(r => r.genres.forEach(g => genreSet.add(g)));
+    sel.innerHTML = '<option value="">Semua Genre</option>';
+    [...genreSet].sort().forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g; opt.textContent = g;
+        sel.appendChild(opt);
+    });
+}
+
+function applySortFilter() {
+    if (!lastCalculationResult) return;
+    const sortBy = document.getElementById('select-sort')?.value || 'similarity';
+    const genreFilter = document.getElementById('select-genre-filter')?.value || '';
+    const cards = [...document.querySelectorAll('[data-rec-card]')];
+    const container = document.getElementById('recommended-games-grid');
+    if (!container) return;
+    cards.forEach(card => {
+        const genres = (card.getAttribute('data-genres') || '').split(',');
+        card.style.display = (!genreFilter || genres.includes(genreFilter)) ? '' : 'none';
+    });
+    const visible = cards.filter(c => c.style.display !== 'none');
+    visible.sort((a, b) => sortBy === 'rating'
+        ? parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating'))
+        : parseFloat(b.getAttribute('data-similarity')) - parseFloat(a.getAttribute('data-similarity')));
+    visible.forEach(c => container.appendChild(c));
+}
+
+// ─── HISTORY MODAL ────────────────────────────────────────────────
+async function openHistoryModal() {
+    toggleModal('modal-history');
+    const container = document.getElementById('history-list-container');
+    if (!container) return;
+    container.innerHTML = `<div class="text-center py-10"><span class="material-symbols-outlined text-3xl text-primary/40 animate-spin">sync</span><p class="text-on-surface-variant font-mono text-xs mt-2">Memuat riwayat...</p></div>`;
+    try {
+        const response = await fetch('{{ route("recommendations.user_history") }}', { headers: { 'Accept': 'application/json' } });
+        const data = await response.json();
+        if (data.status === 'unauthenticated') { container.innerHTML = '<p class="text-center text-on-surface-variant font-mono text-xs py-10">Login untuk melihat riwayat.</p>'; return; }
+        if (!data.histories || data.histories.length === 0) {
+            container.innerHTML = `<div class="text-center py-12"><span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">history</span><p class="text-white font-bold">Belum ada riwayat.</p><p class="text-on-surface-variant text-xs mt-1">Hitung rekomendasi pertamamu!</p></div>`;
+            return;
+        }
+        container.innerHTML = data.histories.map((h, idx) => renderHistoryCard(h, idx)).join('');
+    } catch(e) {
+        container.innerHTML = '<p class="text-center text-red-400 font-mono text-xs py-10">Gagal memuat riwayat.</p>';
+    }
+}
+
+function renderHistoryCard(h, idx) {
+    const genres = (h.selected_genres || []).join(', ') || 'Semua genre';
+    const refGames = (h.reference_games || []).join(', ') || '\u2014';
+    const recs = h.recommended_games || [];
+    const topRecs = recs.slice(0, 3).map(r =>
+        `<div class="p-2 rounded bg-surface-container/60 border border-[#1e293b] flex items-center justify-between gap-2">
+            <div><p class="text-xs font-bold text-white truncate max-w-[120px]">${esc(r.title||'\u2014')}</p><p class="text-[10px] font-code-metric text-on-surface-variant">Sim: ${parseFloat(r.similarity||0).toFixed(3)}</p></div>
+            <span class="text-xs font-code-metric font-bold text-primary shrink-0">${(parseFloat(r.similarity||0)*100).toFixed(1)}%</span>
+        </div>`
+    ).join('');
+    const isLatest = idx === 0;
+    return `<div class="p-4 bg-[#080b11] rounded-xl border ${isLatest?'border-tertiary/50':'border-[#1e293b] hover:border-primary/40'} transition-all duration-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${isLatest?'bg-tertiary animate-pulse':'bg-primary/60'}"></span>
+                <span class="text-xs font-code-metric font-bold text-white uppercase">${esc(h.session_code)}</span>
+                <span class="text-[10px] font-code-metric text-on-surface-variant">${esc(h.created_ago||h.created_at||'')}</span>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-surface-container border border-[#1e293b] text-[10px] font-code-metric text-primary font-bold">Avg: ${(parseFloat(h.avg_similarity||0)*100).toFixed(1)}%</span>
+        </div>
+        <div class="text-xs mb-1"><span class="font-code-metric text-[11px] text-primary">Genre: </span><span class="text-white font-code-metric">${esc(genres)}</span></div>
+        <div class="text-xs mb-2"><span class="font-code-metric text-[11px] text-secondary">Ref: </span><span class="text-on-surface-variant font-code-metric">${esc(refGames)}</span></div>
+        ${recs.length>0?`<div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 pt-2 border-t border-[#1e293b]">${topRecs}</div>`:''}
+    </div>`;
+}
+
+function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    updateTelemetry();
+    document.querySelectorAll('.genre-chip[data-genre]').forEach(btn => {
+        const genre = btn.getAttribute('data-genre');
+        if (selectedGenres.includes(genre)) {
+            btn.classList.add('bg-primary','text-[#002022]','font-bold','border-primary','shadow-[0_0_12px_rgba(0,240,255,0.4)]');
+            btn.classList.remove('border-[#1e293b]','text-on-surface-variant','bg-surface-container/60');
+            const ci = btn.querySelector('.chip-check');
+            if (ci) ci.classList.remove('hidden');
+        }
+    });
+});
+</script>
 @endsection

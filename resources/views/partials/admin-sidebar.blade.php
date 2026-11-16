@@ -22,11 +22,27 @@
     </a>
     <!-- Rapid Re-calibration / Sync CTA -->
     <div class="mt-4 px-1">
-      <button class="relative w-full overflow-hidden flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 via-primary to-purple-600 text-black font-headline font-bold text-xs tracking-wider uppercase shadow-lg shadow-primary/25 hover:shadow-cyan-400/40 hover:brightness-110 active:scale-[0.98] transition-all">
-        <span class="material-symbols-outlined text-[18px] animate-spin text-black" data-icon="sync" style="animation-duration: 3s">sync</span>
-        <span>Sinkronisasi AI</span>
-      </button>
+      <form id="form-recsys-build" action="{{ route('admin.recsys.build') }}" method="POST">
+        @csrf
+        <button type="submit" id="btn-sync-ai" onclick="return confirmSync()"
+          class="relative w-full overflow-hidden flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 via-primary to-purple-600 text-black font-headline font-bold text-xs tracking-wider uppercase shadow-lg shadow-primary/25 hover:shadow-cyan-400/40 hover:brightness-110 active:scale-[0.98] transition-all">
+          <span class="material-symbols-outlined text-[18px] text-black" data-icon="sync" id="sync-icon">sync</span>
+          <span id="sync-label">Sinkronisasi AI</span>
+        </button>
+      </form>
     </div>
+    <script>
+    function confirmSync() {
+      if(!confirm('Rebuild matriks AI? Proses ini memakan ~1 detik untuk 8K game.')) return false;
+      const btn = document.getElementById('btn-sync-ai');
+      const icon = document.getElementById('sync-icon');
+      const label = document.getElementById('sync-label');
+      if(btn) btn.disabled = true;
+      if(icon) { icon.classList.add('animate-spin'); }
+      if(label) label.textContent = 'Membangun...';
+      return true;
+    }
+    </script>
     <!-- Cockpit Navigation Tabs -->
     <nav aria-label="Navigasi Utama Admin" class="mt-6 space-y-1.5 font-headline" id="admin-nav-list">
       <div class="px-2 pb-1 text-[10px] font-mono font-bold uppercase tracking-widest text-outline">

@@ -28,7 +28,7 @@
         </div>
         <div class="flex items-center justify-center gap-2 mb-1">
           <span class="text-2xl font-headline-md font-extrabold text-white uppercase tracking-wider">Game<span class="text-secondary">Match</span></span>
-          <span class="px-1.5 py-0.2 text-[9px] font-label-sm font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded tracking-widest">v2.4</span>
+          <span class="px-1.5 py-0.2 text-[9px] font-label-sm font-bold bg-secondary/20 text-secondary border border-secondary/40 rounded tracking-widest">v1.0</span>
         </div>
         <h3 class="text-lg font-headline-sm font-bold text-white uppercase tracking-wide">
           Buat Akun Baru

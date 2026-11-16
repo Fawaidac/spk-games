@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'GameMatch Console - Klasifikasi & Taksonomi 32 Genre Game')
-@section('header-title', 'Klasifikasi & Taksonomi 32 Genre Game')
+@section('title', 'GameMatch Console - Klasifikasi & Taksonomi {{ $totalGenres }} Genre Game')
+@section('header-title', 'Klasifikasi & Taksonomi Genre Game')
 @section('header-subtitle', 'Peta sebaran kategori, bobot vektor TF-IDF, dan standarisasi genre')
 
 @section('admin-content')
@@ -16,7 +16,7 @@
                     Manajemen &amp; Taksonomi Genre Steam
                   </h3>
                   <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-secondary/20 text-secondary border border-secondary/40">
-                    32 KATEGORI TERSTANDARISASI
+                    {{ $totalGenres }} KATEGORI TERSTANDARISASI
                   </span>
                 </div>
                 <p class="font-mono text-xs text-on-surface-variant mt-1">
@@ -51,7 +51,7 @@
               <div class="p-4 rounded-xl bg-surface-container border border-outline-variant flex items-center justify-between">
                 <div>
                   <p class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">Total Kategori</p>
-                  <p class="text-2xl font-headline font-extrabold text-white mt-1">32 Genre</p>
+                  <p class="text-2xl font-headline font-extrabold text-white mt-1">{{ $totalGenres }} Genre</p>
                   <p class="text-[10px] font-mono text-secondary mt-0.5">100% Ter-vektorisasi</p>
                 </div>
                 <div class="p-3 rounded-lg bg-secondary/15 text-secondary border border-secondary/30">
@@ -62,7 +62,7 @@
                 <div>
                   <p class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">Dominansi Multi-Label</p>
                   <p class="text-2xl font-headline font-extrabold text-primary mt-1">Action &bull; RPG</p>
-                  <p class="text-[10px] font-mono text-primary/80 mt-0.5">53.8% dari total 52K game</p>
+                  <p class="text-[10px] font-mono text-primary/80 mt-0.5">dari total {{ number_format($totalGames) }} game</p>
                 </div>
                 <div class="p-3 rounded-lg bg-primary/15 text-primary border border-primary/30">
                   <span class="material-symbols-outlined text-2xl">insights</span>
