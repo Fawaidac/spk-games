@@ -347,4 +347,44 @@ class RecommendationTest extends TestCase
             }
         }
     }
+
+    // =========================================================================
+    // TEST 9: Matched genres dihitung dari union genre pilihan dan favorit
+    // =========================================================================
+
+    /**
+     * Memastikan 'matched_genres' pada kartu hasil rekomendasi dihitung
+     * terhadap gabungan (union) genre pilihan pengguna dan genre dari game favoritnya.
+     */
+    #[Test]
+    public function test_matched_genres_is_union_of_selected_genres_and_favorite_game_genres(): void
+    {
+        /** @var ContentBasedRecommender $service */
+        $service = app(ContentBasedRecommender::class);
+        $matrix = $service->loadMatrix();
+
+        // Ambil game favorit pertama dan dapatkan genre-genrenya
+        $favGameId = $this->validGameIds[0];
+        $favGenres = $matrix['games'][$favGameId]['genres'] ?? [];
+        $this->assertNotEmpty($favGenres, 'Game favorit harus memiliki genre');
+
+        // Pilih selectedGenres yang sengaja kosong atau berbeda dari genre favorit
+        $result = $service->calculateRecommendations(
+            favoriteGameIds: [$favGameId],
+            selectedGenres: [], // kosong, sehingga union hanya berisi $favGenres
+            topN: 10
+        );
+
+        $this->assertNotEmpty($result['recommendations']);
+
+        // Pastikan matched_genres dievaluasi terhadap $favGenres
+        foreach ($result['recommendations'] as $rec) {
+            $expectedOverlap = array_values(array_intersect($rec['genres'], $favGenres));
+            $this->assertEquals(
+                $expectedOverlap,
+                $rec['matched_genres'],
+                "matched_genres untuk id={$rec['id']} harus sesuai union genre favorit"
+            );
+        }
+    }
 }

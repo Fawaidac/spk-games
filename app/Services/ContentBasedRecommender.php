@@ -349,12 +349,16 @@ class ContentBasedRecommender
         // Genre yang dipilih di langkah 1 ikut ditambahkan ke vektor profil (nilai 1 pada dimensi genre tersebut sebelum dirata-ratakan).
         $profileAccumulator = array_fill(0, $totalDimensions, 0.0);
         $validFavCount = 0;
+        $favGenresList = [];
 
         foreach ($favoriteGameIds as $favId) {
             if (isset($gamesData[$favId])) {
                 $validFavCount++;
                 foreach ($gamesData[$favId]['vector'] as $dim => $val) {
                     $profileAccumulator[$dim] += (float) $val;
+                }
+                if (!empty($gamesData[$favId]['genres'])) {
+                    $favGenresList = array_merge($favGenresList, $gamesData[$favId]['genres']);
                 }
             }
         }
@@ -363,6 +367,9 @@ class ContentBasedRecommender
         if ($validFavCount === 0) {
             throw new \RuntimeException('Game favorit yang dipilih tidak ditemukan dalam matriks rekomendasi.');
         }
+
+        // Gabungan genre pilihan pengguna dan genre dari game favoritnya (union) untuk perhitungan "genre sama"
+        $userUnionGenres = array_values(array_unique(array_merge($selectedGenres, $favGenresList)));
 
         // Tambahkan nilai 1 pada dimensi genre yang dipilih sebelum dirata-ratakan
         foreach ($selectedGenres as $genreName) {
@@ -435,8 +442,8 @@ class ContentBasedRecommender
                 $topContributions = array_slice($contributions, 0, 5);
             }
 
-            // Hitung irisan genre game ini dengan profil preferensi pengguna
-            $matchedGenres = array_values(array_intersect($gameEntry['genres'], $selectedGenres));
+            // Hitung irisan genre game ini dengan gabungan genre pilihan & favorit pengguna (union)
+            $matchedGenres = array_values(array_intersect($gameEntry['genres'], $userUnionGenres));
 
             $candidates[] = [
                 'id'                  => (int) $gameId,

@@ -300,7 +300,7 @@
                             </h3>
                             <p
                                 class="text-body-md font-body-md text-on-surface-variant leading-relaxed"
-                            >Tentukan tag, kategori Steam, serta karakteristik mekanisme game (seperti Turn-based, Soulslike, atau Story Rich) yang paling Anda minati.</p>
+                            >Pilih genre favorit dan game referensi yang paling Anda minati.</p>
                         </div>
                         <div
                             class="mt-6 pt-4 border-t border-[#1e293b] flex items-center gap-2 text-primary text-xs font-code-metric"
@@ -811,7 +811,7 @@
                         </div>
                         <p
                             class="text-body-md font-body-md text-on-surface-variant leading-relaxed"
-                        >Sistem rekomendasi GameMatch mengimplementasikan pendekatan <strong>Content-Based Filtering</strong> murni. Alih-alih mengandalkan rating pengguna lain yang rentan bias (seperti collaborative filtering), mesin kami mengkaji profil intrinsik setiap game: kombinasi genre, tag deskripsi Steam, developer, publisher, dan fitur gameplay.</p>
+                        >Sistem rekomendasi GameMatch mengimplementasikan pendekatan <strong>Content-Based Filtering</strong> murni. Alih-alih mengandalkan rating pengguna lain yang rentan bias (seperti collaborative filtering), mesin kami mengkaji profil intrinsik setiap game: kombinasi genre, deskripsi (TF-IDF), dan rating.</p>
                         <p
                             class="text-body-md font-body-md text-on-surface-variant leading-relaxed"
                         >Setiap metadata ditransformasikan ke dalam representasi vektor multi-dimensi menggunakan pembobotan frekuensi istilah (TF-IDF). Dari matriks tersebut, kedekatan antar game diukur melalui sudut cosinus dari dua vektor fitur non-nol.</p>
@@ -909,20 +909,20 @@
                                     >{{ $totalDimensions }}</span
                                 >
                                 <span class="text-[10px] font-code-metric text-on-surface-variant"
-                                    >Fitur Tag TF-IDF</span
+                                    >Fitur Vektor</span
                                 >
                             </div>
                             <div
                                 class="bg-[#0f1422] rounded-xl p-4 border border-[#1e293b] text-center hover:border-primary/40 transition-colors"
                             >
                                 <span class="text-[11px] font-code-metric text-on-surface-variant block uppercase"
-                                    >Update Berkala</span
+                                    >Dataset</span
                                 >
                                 <span
-                                    class="text-2xl font-headline-md font-extrabold text-primary mt-1 block drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-                                    >24 Jam</span
+                                    class="text-lg md:text-xl font-headline-md font-extrabold text-primary mt-1 block drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"
+                                    >Steam Kaggle</span
                                 >
-                                <span class="text-[10px] font-code-metric text-primary/80">Steam Sync API</span>
+                                <span class="text-[10px] font-code-metric text-primary/80">(statis)</span>
                             </div>
                         </div>
                     </div>
@@ -1125,9 +1125,9 @@ function renderRecommendations(data) {
         const genreTagsHtml = rec.genres.slice(0, 3).map(g =>
             `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-secondary/15 text-secondary border border-secondary/30">${esc(g)}</span>`
         ).join('');
-        const badgeColor = pct >= 70 ? 'text-primary border-primary/40 bg-primary/10'
-                         : pct >= 40 ? 'text-secondary border-secondary/40 bg-secondary/10'
-                                     : 'text-tertiary border-tertiary/40 bg-tertiary/10';
+        const badgeColor = pct >= 70 ? 'text-primary border-primary/60 shadow-[0_0_10px_rgba(0,240,255,0.2)]'
+                         : pct >= 40 ? 'text-secondary border-secondary/60 shadow-[0_0_10px_rgba(192,132,252,0.2)]'
+                                     : 'text-tertiary border-tertiary/60 shadow-[0_0_10px_rgba(0,255,163,0.2)]';
         const topFeatures = (rec.calculation_details?.top_features || []).slice(0, 5);
         const featHtml = topFeatures.map(f =>
             `<div class="flex justify-between gap-2 text-[10px] font-mono py-0.5 border-b border-outline-variant/30">
@@ -1151,7 +1151,7 @@ function renderRecommendations(data) {
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-primary/20 text-primary border border-primary/40">PC</span>
-                <span class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${badgeColor}">${pct}%</span>
+                <span class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border bg-[#080b11]/85 backdrop-blur-sm shadow-md ${badgeColor}">${pct}%</span>
             </div>
             <div class="p-3 flex flex-col gap-2 flex-1">
                 <div>
